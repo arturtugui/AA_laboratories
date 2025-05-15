@@ -60,7 +60,7 @@ public class KRegularGraphGenerator {
             for (V v : graph.getVertices()) {
                 List<V> neighbors = new ArrayList<>(graph.getAdjacencyList().get(v));
                 for (V neighbor : neighbors) {
-                    graph.removeEdge(v, neighbor);
+                    removeUndirectedEdge(graph, v, neighbor);
                 }
             }
 
@@ -109,11 +109,32 @@ public class KRegularGraphGenerator {
                 return false;
             }
 
-            graph.addEdge(v1, v2);
+            addUndirectedEdge(graph, v1, v2);
         }
 
         // Check if the graph is connected
         return isConnected(graph, vertices[0], vertices);
+    }
+
+    /**
+     * Adds an undirected edge between two vertices, ensuring it appears in both adjacency lists
+     */
+    private static <V> void addUndirectedEdge(Graph<V> graph, V v1, V v2) {
+        graph.addEdge(v1, v2);
+
+        // Ensure the edge is added in both directions by checking if it's already bidirectional
+        Map<V, List<V>> adjacencyList = graph.getAdjacencyList();
+        if (!adjacencyList.get(v2).contains(v1)) {
+            graph.addEdge(v2, v1);
+        }
+    }
+
+    /**
+     * Removes an undirected edge between two vertices, ensuring it's removed from both adjacency lists
+     */
+    private static <V> void removeUndirectedEdge(Graph<V> graph, V v1, V v2) {
+        graph.removeEdge(v1, v2);
+        graph.removeEdge(v2, v1);
     }
 
     /**
@@ -174,7 +195,7 @@ public class KRegularGraphGenerator {
     public static void main(String[] args) {
         try {
             // Example: Generate a 3-regular graph with 10 vertices
-            Graph<String> regularGraph = generateStringLabelKRegularGraph(30, 5);
+            Graph<String> regularGraph = generateStringLabelKRegularGraph(10, 3);
             System.out.println("Generated connected k-regular graph:");
             regularGraph.printGraph();
 

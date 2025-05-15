@@ -69,34 +69,18 @@ public class DirectedUndirecrtedGraphGenerator {
             List<V> remainingList = new ArrayList<>(remainingVertices);
             V toVertex = remainingList.get(random.nextInt(remainingList.size()));
 
-
-
             // Add edge
             graph.addEdge(fromVertex, toVertex);
 
-            // If undirected, also add the reverse edge in our tracking (but not in the graph)
-            // This prevents double-counting edges in our algorithm
+            // For undirected graphs, manually ensure the edge exists in both directions
+            if (!isDirected) {
+                ensureUndirectedEdge(graph, fromVertex, toVertex);
+            }
 
             // Move the vertex from remaining to included
             includedVertices.add(toVertex);
             remainingVertices.remove(toVertex);
         }
-
-//        System.out.println("Generated spanning tree:");
-//        graph.printGraph();
-
-        // Visualize the graph
-        //Graph<V> spanningTreeGraph = new Graph<>(graph);
-        //javax.swing.SwingUtilities.invokeLater(() -> new DirectedUndirectedGraphVisualizer((Graph<String>) spanningTreeGraph));
-
-        if (!isDirected) {
-            normalizeUndirectedEdges(graph);
-        }
-
-        //System.out.println("Modified spanning tree:");
-        //graph.printGraph();
-
-
 
         // We now have n-1 edges in our graph (a spanning tree)
         int addedEdges = n - 1;
@@ -136,13 +120,34 @@ public class DirectedUndirecrtedGraphGenerator {
             }
 
             graph.addEdge(edge.from, edge.to);
-            addedEdges++;
 
-            // For undirected graphs, we don't need to add the reverse edge
-            // as the Graph.Graph class should handle that
+            // For undirected graphs, manually ensure the edge exists in both directions
+            if (!isDirected) {
+                ensureUndirectedEdge(graph, edge.from, edge.to);
+            }
+
+            addedEdges++;
         }
 
         return graph;
+    }
+
+    /**
+     * Helper method to ensure that for undirected graphs, edges exist in both directions
+     * in the adjacency list
+     */
+    private static <V> void ensureUndirectedEdge(Graph<V> graph, V from, V to) {
+        Map<V, List<V>> adjacencyList = getAdjacencyList(graph);
+
+        // Ensure from -> to exists
+        if (!adjacencyList.get(from).contains(to)) {
+            adjacencyList.get(from).add(to);
+        }
+
+        // Ensure to -> from exists
+        if (!adjacencyList.get(to).contains(from)) {
+            adjacencyList.get(to).add(from);
+        }
     }
 
     /**
@@ -210,33 +215,11 @@ public class DirectedUndirecrtedGraphGenerator {
         return generateConnectedGraph(n, m, isDirected, labels);
     }
 
-    private static <V extends Comparable<V>> void normalizeUndirectedEdges(Graph<V> graph) {
-        Map<V, List<V>> adjacencyList = getAdjacencyList(graph);
-
-        Set<EdgePair<V>> toReplace = new HashSet<>();
-
-        for (Map.Entry<V, List<V>> entry : adjacencyList.entrySet()) {
-            V from = entry.getKey();
-            for (V to : new ArrayList<>(entry.getValue())) {
-                // Only process if from > to (lexicographically), and it's an undirected graph
-                if (from.compareTo(to) > 0) {
-                    toReplace.add(new EdgePair<>(from, to));
-                }
-            }
-        }
-
-        for (EdgePair<V> edge : toReplace) {
-            graph.removeEdge(edge.from, edge.to);  // Remove EA
-            graph.addEdge(edge.to, edge.from);     // Add AE
-        }
-    }
-
-
     public static void main(String[] args) {
         // Example usage - create a random connected graph with 10 vertices and 15 edges
         try {
-            Graph<String> randomGraph = generateStringLabelGraph(6, 15, false);
-            //Graph.Graph<String> randomGraph = generateStringLabelGraph(6, 20, true);
+            Graph<String> randomGraph = generateStringLabelGraph(6, 7, false);
+            //Graph<String> randomGraph = generateStringLabelGraph(6, 14, true);
             System.out.println("Generated random connected graph:");
             randomGraph.printGraph();
 

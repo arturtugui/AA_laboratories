@@ -143,6 +143,10 @@ public class BipartiteGraphGenerator {
 
             // Add the edge to the graph
             graph.addEdge(source, target);
+
+            // Ensure the edge exists in both directions
+            ensureUndirectedEdge(graph, source, target);
+
             includedVertices.add(target);
         }
     }
@@ -189,6 +193,10 @@ public class BipartiteGraphGenerator {
             }
 
             graph.addEdge(edge.from, edge.to);
+
+            // Ensure the edge exists in both directions
+            ensureUndirectedEdge(graph, edge.from, edge.to);
+
             added++;
         }
 
@@ -196,6 +204,24 @@ public class BipartiteGraphGenerator {
         if (added < edgesToAdd) {
             throw new IllegalArgumentException("Could not add " + edgesToAdd +
                     " additional edges. Only " + added + " edges were available.");
+        }
+    }
+
+    /**
+     * Helper method to ensure that for undirected graphs, edges exist in both directions
+     * in the adjacency list
+     */
+    private static <V> void ensureUndirectedEdge(Graph<V> graph, V from, V to) {
+        Map<V, List<V>> adjacencyList = graph.getAdjacencyList();
+
+        // Ensure from -> to exists
+        if (!adjacencyList.get(from).contains(to)) {
+            adjacencyList.get(from).add(to);
+        }
+
+        // Ensure to -> from exists
+        if (!adjacencyList.get(to).contains(from)) {
+            adjacencyList.get(to).add(from);
         }
     }
 

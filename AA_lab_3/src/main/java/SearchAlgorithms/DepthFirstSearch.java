@@ -1,12 +1,16 @@
 package SearchAlgorithms;
 
+import Bipartite.BipartiteGraphVisualizer;
 import DirectedAndUndirected.DirectedUndirectedGraphVisualizer;
 import Graph.Graph;
 
 import javax.swing.*;
 import java.util.*;
 
+import static Bipartite.BipartiteGraphGenerator.generateStringLabelBipartiteGraph;
+import static Bipartite.BipartiteGraphGenerator.getBipartitePartitions;
 import static DirectedAndUndirected.DirectedUndirecrtedGraphGenerator.generateStringLabelGraph;
+import static KRegular.KRegularGraphGenerator.generateStringLabelKRegularGraph;
 
 public class DepthFirstSearch {
 
@@ -48,13 +52,41 @@ public class DepthFirstSearch {
     }
 
     public static void main(String[] args) {
-        Graph<String> graph = generateStringLabelGraph(8, 7, false);
+        //undirected
+        Graph<String> graph = generateStringLabelGraph(6, 10, false);
         graph.printGraph();
         SwingUtilities.invokeLater(() -> new DirectedUndirectedGraphVisualizer(graph));
+
+//        //directed
+//        Graph<String> graph = generateStringLabelGraph(6, 20, true);
+//        graph.printGraph();
+//        SwingUtilities.invokeLater(() -> new DirectedUndirectedGraphVisualizer(graph));
+
+//        //bipartite
+//        Graph<String> graph = generateStringLabelBipartiteGraph(9, 12, 3);
+//        graph.printGraph();
+//
+//        Set<String>[] partitions = getBipartitePartitions(graph);
+//        System.out.println("Set U: " + partitions[0]);
+//        System.out.println("Set V: " + partitions[1]);
+//        javax.swing.SwingUtilities.invokeLater(() ->
+//                BipartiteGraphVisualizer.visualizeBipartiteGraph(graph, partitions[0], partitions[1]));
+//
+//        //for bipartite
+//        System.out.println("DFS traversal starting from node U1:");
+//        int maxStackSize = dfs(graph, "U1");
+//        System.out.println("Maximum stack size during DFS: " + maxStackSize);
+
+//        Graph<String> graph = generateStringLabelKRegularGraph(10, 3);
+//        graph.printGraph();
 
         System.out.println("DFS traversal starting from node A:");
         int maxStackSize = dfs(graph, "A");
         System.out.println("Maximum stack size during DFS: " + maxStackSize);
+
+
+
+
 
         // If not all nodes were visited, try to identify disconnected components
         if (graph.getAdjacencyList().size() > 0) {

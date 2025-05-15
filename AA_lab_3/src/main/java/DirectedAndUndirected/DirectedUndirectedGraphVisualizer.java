@@ -20,7 +20,7 @@ public class DirectedUndirectedGraphVisualizer extends JFrame {
         this.vertexPositions = new HashMap<>();
 
         // Initialize the frame
-        setTitle("Graph.Graph Visualization");
+        setTitle("Simple Graph Visualization");
         setSize(WIDTH, HEIGHT);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

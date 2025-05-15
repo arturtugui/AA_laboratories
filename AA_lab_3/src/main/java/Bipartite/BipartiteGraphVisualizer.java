@@ -37,7 +37,7 @@ public class BipartiteGraphVisualizer extends JFrame {
         this.vertexPositions = new HashMap<>();
 
         // Initialize the frame
-        setTitle("Bipartite Graph.Graph Visualization");
+        setTitle("Bipartite Graph Visualization");
         setSize(WIDTH, HEIGHT);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

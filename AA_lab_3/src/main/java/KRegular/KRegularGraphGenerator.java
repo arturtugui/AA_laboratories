@@ -53,7 +53,7 @@ public class KRegularGraphGenerator {
 
         Random random = new Random();
         boolean isConnected = false;
-        int maxAttempts = 1000; // Limit the number of attempts
+        int maxAttempts = 100000; // Limit the number of attempts
 
         while (!isConnected && maxAttempts > 0) {
             // Clear any existing edges
@@ -72,7 +72,7 @@ public class KRegularGraphGenerator {
         }
 
         if (!isConnected) {
-            throw new IllegalArgumentException("Failed to generate a connected k-regular graph after multiple attempts. Try different parameters.");
+            throw new IllegalArgumentException("Failed to generate a connected k-regular graph after multiple attempts. Try different parameters. n = " + n);
         }
 
         return graph;

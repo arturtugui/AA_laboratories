@@ -188,7 +188,7 @@ public class MainBipartiteEqualSparse {
                 Graph<String> graph = graphs[i];
 
                 long startTime = System.nanoTime();
-                int maxSize = func.apply(graph, "A");
+                int maxSize = func.apply(graph, "U1");
                 long endTime = System.nanoTime();
 
                 long elapsedTime = (endTime - startTime) / 1_000_000;

@@ -4,6 +4,8 @@ import Graph.Graph;
 
 import java.util.*;
 
+import static Bipartite.BipartiteGraphGenerator.generateStringLabelBipartiteGraph;
+import static DirectedAndUndirected.DirectedUndirectedGraphGenerator.generateStringLabelGraph;
 import static KRegular.KRegularGraphGenerator.generateStringLabelKRegularGraph;
 
 public class BreadthFirstSearch {
@@ -67,20 +69,27 @@ public class BreadthFirstSearch {
     }
 
     public static void main(String[] args) {
-//        //undirected
-//        Graph<String> graph = generateStringLabelGraph(10, 18, false);
-//        //Graph<String> graph = generateStringLabelGraph(5000, 4999, false);
-//        graph.printGraph();
-//        SwingUtilities.invokeLater(() -> new DirectedUndirectedGraphVisualizer(graph));
+        System.out.println("\n\nUndirected:");
+        Graph<String> graph = generateStringLabelGraph(6, 15, false);
+        graph.printGraph();
+        System.out.println("DFS traversal starting from node A:");
+        int maxStackSize = bfsWithOutput(graph, "A");
+        System.out.println("Maximum stack size during DFS: " + maxStackSize);
+        //SwingUtilities.invokeLater(() -> new DirectedUndirectedGraphVisualizer(graph));
 
-//        //directed
-//        Graph<String> graph = generateStringLabelGraph(6, 20, true);
-//        graph.printGraph();
-//        SwingUtilities.invokeLater(() -> new DirectedUndirectedGraphVisualizer(graph));
+        System.out.println("\n\nDirected:");
+        //directed
+        graph = generateStringLabelGraph(6, 30, true);
+        graph.printGraph();
+        System.out.println("DFS traversal starting from node A:");
+        maxStackSize = bfsWithOutput(graph, "A");
+        System.out.println("Maximum stack size during DFS: " + maxStackSize);
+        //SwingUtilities.invokeLater(() -> new DirectedUndirectedGraphVisualizer(graph));
 
-//        //bipartite
-//        Graph<String> graph = generateStringLabelBipartiteGraph(9, 12, 3);
-//        graph.printGraph();
+        System.out.println("\n\nBipartite:");
+        //bipartite
+        graph = generateStringLabelBipartiteGraph(9, 18, 3);
+        graph.printGraph();
 //
 //        Set<String>[] partitions = getBipartitePartitions(graph);
 //        System.out.println("Set U: " + partitions[0]);
@@ -89,15 +98,16 @@ public class BreadthFirstSearch {
 //                BipartiteGraphVisualizer.visualizeBipartiteGraph(graph, partitions[0], partitions[1]));
 //
 //        //for bipartite
-//        System.out.println("DFS traversal starting from node U1:");
-//        int maxStackSize = bfs(graph, "U1");
-//        System.out.println("Maximum stack size during DFS: " + maxStackSize);
+        System.out.println("DFS traversal starting from node U1:");
+        maxStackSize = bfsWithOutput(graph, "U1");
+        System.out.println("Maximum stack size during DFS: " + maxStackSize);
 
-        Graph<String> graph = generateStringLabelKRegularGraph(10, 3);
+        System.out.println("\n\nK-regular:");
+        graph = generateStringLabelKRegularGraph(10, 3);
         graph.printGraph();
 
         System.out.println("DFS traversal starting from node A:");
-        int maxStackSize = bfs(graph, "A");
+        maxStackSize = bfsWithOutput(graph, "A");
         System.out.println("Maximum stack size during DFS: " + maxStackSize);
     }
 }

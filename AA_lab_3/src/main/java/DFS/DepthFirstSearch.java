@@ -4,7 +4,9 @@ import Graph.Graph;
 
 import java.util.*;
 
+import static Bipartite.BipartiteGraphGenerator.generateStringLabelBipartiteGraph;
 import static DirectedAndUndirected.DirectedUndirectedGraphGenerator.generateStringLabelGraph;
+import static KRegular.KRegularGraphGenerator.generateStringLabelKRegularGraph;
 
 public class DepthFirstSearch {
 
@@ -13,31 +15,25 @@ public class DepthFirstSearch {
         Stack<V> stack = new Stack<>();
         int maxStackSize = 0;
 
-        // First push the start node to the stack (but don't mark as visited yet)
+        visited.add(startNode);
         stack.push(startNode);
         maxStackSize = 1;
 
         while (!stack.isEmpty()) {
             V current = stack.pop();
+            //System.out.print(current + " ");
 
-            // Only process the node if we haven't visited it yet
-            if (!visited.contains(current)) {
-                //System.out.print(current + " ");
-                visited.add(current);
+            // Get all neighbors
+            List<V> neighbors = graph.getAdjacencyList().getOrDefault(current, new ArrayList<>());
 
-                // Get all neighbors
-                List<V> neighbors = graph.getAdjacencyList().getOrDefault(current, new ArrayList<>());
-
-                // Process neighbors in reverse order to maintain the expected DFS traversal order
-                for (int i = neighbors.size() - 1; i >= 0; i--) {
-                    V neighbor = neighbors.get(i);
-                    if (!visited.contains(neighbor)) {
-                        visited.add(neighbor); // Mark as visited immediately
-                        stack.push(neighbor);
-                        maxStackSize = Math.max(maxStackSize, stack.size());
-                    }
+            // Process neighbors in reverse order
+            for (int i = neighbors.size() - 1; i >= 0; i--) {
+                V neighbor = neighbors.get(i);
+                if (!visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    stack.push(neighbor);
+                    maxStackSize = Math.max(maxStackSize, stack.size());
                 }
-
             }
         }
 
@@ -52,31 +48,25 @@ public class DepthFirstSearch {
         Stack<V> stack = new Stack<>();
         int maxStackSize = 0;
 
-        // First push the start node to the stack (but don't mark as visited yet)
+        visited.add(startNode);
         stack.push(startNode);
         maxStackSize = 1;
 
         while (!stack.isEmpty()) {
             V current = stack.pop();
+            System.out.print(current + " ");
 
-            // Only process the node if we haven't visited it yet
-            if (!visited.contains(current)) {
-                System.out.print(current + " ");
-                visited.add(current);
+            // Get all neighbors
+            List<V> neighbors = graph.getAdjacencyList().getOrDefault(current, new ArrayList<>());
 
-                // Get all neighbors
-                List<V> neighbors = graph.getAdjacencyList().getOrDefault(current, new ArrayList<>());
-
-                // Process neighbors in reverse order to maintain the expected DFS traversal order
-                for (int i = neighbors.size() - 1; i >= 0; i--) {
-                    V neighbor = neighbors.get(i);
-                    if (!visited.contains(neighbor)) {
-                        visited.add(neighbor); // Mark as visited immediately
-                        stack.push(neighbor);
-                        maxStackSize = Math.max(maxStackSize, stack.size());
-                    }
+            // Process neighbors in reverse order
+            for (int i = neighbors.size() - 1; i >= 0; i--) {
+                V neighbor = neighbors.get(i);
+                if (!visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    stack.push(neighbor);
+                    maxStackSize = Math.max(maxStackSize, stack.size());
                 }
-
             }
         }
 
@@ -91,18 +81,28 @@ public class DepthFirstSearch {
         int n = 5000;
         //Graph<String> graph = generateStringLabelGraph(n, (n*(n-1))/2, false);
         Graph<String> graph = generateStringLabelGraph(n, (n-1), false);
-        //Graph<String> graph = generateStringLabelGraph(5000, 4999, false);
-        //graph.printGraph();
+
+        System.out.println("\n\nUndirected:");
+        //Graph<String> graph = generateStringLabelGraph(6, 15, false);
+        graph.printGraph();
+        System.out.println("DFS traversal starting from node A:");
+        int maxStackSize = dfsWithOutput(graph, "A");
+        System.out.println("Maximum stack size during DFS: " + maxStackSize);
         //SwingUtilities.invokeLater(() -> new DirectedUndirectedGraphVisualizer(graph));
 
-//        //directed
-//        Graph<String> graph = generateStringLabelGraph(6, 20, true);
-//        graph.printGraph();
-//        SwingUtilities.invokeLater(() -> new DirectedUndirectedGraphVisualizer(graph));
+        System.out.println("\n\nDirected:");
+        //directed
+        graph = generateStringLabelGraph(6, 30, true);
+        graph.printGraph();
+        System.out.println("DFS traversal starting from node A:");
+        maxStackSize = dfsWithOutput(graph, "A");
+        System.out.println("Maximum stack size during DFS: " + maxStackSize);
+        //SwingUtilities.invokeLater(() -> new DirectedUndirectedGraphVisualizer(graph));
 
-//        //bipartite
-//        Graph<String> graph = generateStringLabelBipartiteGraph(9, 12, 3);
-//        graph.printGraph();
+        System.out.println("\n\nBipartite:");
+        //bipartite
+        graph = generateStringLabelBipartiteGraph(9, 18, 3);
+        graph.printGraph();
 //
 //        Set<String>[] partitions = getBipartitePartitions(graph);
 //        System.out.println("Set U: " + partitions[0]);
@@ -111,15 +111,16 @@ public class DepthFirstSearch {
 //                BipartiteGraphVisualizer.visualizeBipartiteGraph(graph, partitions[0], partitions[1]));
 //
 //        //for bipartite
-//        System.out.println("DFS traversal starting from node U1:");
-//        int maxStackSize = dfs(graph, "U1");
-//        System.out.println("Maximum stack size during DFS: " + maxStackSize);
+        System.out.println("DFS traversal starting from node U1:");
+        maxStackSize = dfsWithOutput(graph, "U1");
+        System.out.println("Maximum stack size during DFS: " + maxStackSize);
 
-//        Graph<String> graph = generateStringLabelKRegularGraph(10, 3);
-//        graph.printGraph();
+        System.out.println("\n\nK-regular:");
+        graph = generateStringLabelKRegularGraph(10, 3);
+        graph.printGraph();
 
         System.out.println("DFS traversal starting from node A:");
-        int maxStackSize = dfs(graph, "A");
+        maxStackSize = dfsWithOutput(graph, "A");
         System.out.println("Maximum stack size during DFS: " + maxStackSize);
 
 

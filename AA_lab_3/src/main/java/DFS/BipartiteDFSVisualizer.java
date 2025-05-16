@@ -1,6 +1,6 @@
-package SearchAlgorithms;
+package DFS;
 
-import DirectedAndUndirected.DirectedUndirectedGraphVisualizer;
+import Bipartite.BipartiteGraphGenerator;
 import Graph.Graph;
 
 import javax.swing.*;
@@ -9,14 +9,27 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
-public class DFSVisualizer extends JFrame {
+import static Bipartite.BipartiteGraphGenerator.getBipartitePartitions;
+import static DFS.DepthFirstSearch.dfs;
+import static DFS.DepthFirstSearch.dfsWithOutput;
+
+/**
+ * A specialized visualizer for DFS traversal on bipartite graphs that renders the two vertex sets
+ * in different positions and colors to make the bipartite structure clear.
+ */
+public class BipartiteDFSVisualizer extends JFrame {
     private Graph<String> graph;
     private Map<String, Point> vertexPositions;
+    private Set<String> setU;
+    private Set<String> setV;
     private static final int VERTEX_RADIUS = 20;
     private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
+
+    // Bipartite sets colors
+    private static final Color SET_U_COLOR = new Color(173, 216, 230); // Light blue
+    private static final Color SET_V_COLOR = new Color(255, 182, 193); // Light pink
 
     // DFS visualization state
     private Set<String> visited;
@@ -28,19 +41,32 @@ public class DFSVisualizer extends JFrame {
     private Timer animationTimer;
     private int delayMs = 1000; // Delay between steps in milliseconds
 
-    // Color constants
-    private static final Color UNVISITED_COLOR = Color.LIGHT_GRAY;
-    private static final Color VISITED_COLOR = Color.GREEN;
-    private static final Color CURRENT_COLOR = Color.RED;
-    private static final Color STACK_COLOR = Color.YELLOW;
-    private static final Color EDGE_COLOR = Color.BLACK;
-    private static final Color TRAVERSED_EDGE_COLOR = Color.BLUE;
+    // Color constants for DFS visualization
+    private static final Color UNVISITED_COLOR_U = new Color(173, 216, 230, 128); // Transparent light blue
+    private static final Color UNVISITED_COLOR_V = new Color(255, 182, 193, 128); // Transparent light pink
+    private static final Color VISITED_COLOR = new Color(50, 205, 50, 200); // Green
+    private static final Color CURRENT_COLOR = new Color(255, 69, 0, 220); // Red-orange
+    private static final Color STACK_COLOR = new Color(255, 215, 0, 200); // Gold
+    private static final Color EDGE_COLOR = Color.GRAY;
+    private static final Color TRAVERSED_EDGE_COLOR = new Color(0, 0, 255, 220); // Blue
+
+    private boolean isPaused = false;
+    private JButton pauseButton;
 
     // Track traversed edges
     private Set<Edge> traversedEdges;
 
-    public DFSVisualizer(Graph<String> graph) {
+    /**
+     * Creates a new bipartite DFS visualizer with the specified graph and partitions.
+     *
+     * @param graph The bipartite graph to visualize
+     * @param setU The first partition (set U)
+     * @param setV The second partition (set V)
+     */
+    public BipartiteDFSVisualizer(Graph<String> graph, Set<String> setU, Set<String> setV) {
         this.graph = graph;
+        this.setU = setU;
+        this.setV = setV;
         this.vertexPositions = new HashMap<>();
         this.visited = new HashSet<>();
         this.stack = new Stack<>();
@@ -49,23 +75,27 @@ public class DFSVisualizer extends JFrame {
         this.traversedEdges = new HashSet<>();
 
         // Initialize the frame
-        setTitle("DFS Algorithm Visualization");
+        setTitle("Bipartite DFS Algorithm Visualization");
         setSize(WIDTH, HEIGHT);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Auto-generate positions for vertices in a circle layout
-        generateVertexPositions();
+        // Generate positions for vertices in bipartite layout
+        generateBipartiteLayout();
 
-        // Initialize all nodes with unvisited color
+        // Initialize all nodes with unvisited color based on their set
         for (String vertex : graph.getVertices()) {
-            nodeColors.put(vertex, UNVISITED_COLOR);
+            if (setU.contains(vertex)) {
+                nodeColors.put(vertex, UNVISITED_COLOR_U);
+            } else if (setV.contains(vertex)) {
+                nodeColors.put(vertex, UNVISITED_COLOR_V);
+            }
         }
 
         // Create control panel
         JPanel controlPanel = createControlPanel();
 
         // Add graph panel
-        GraphPanel graphPanel = new GraphPanel();
+        BipartiteGraphPanel graphPanel = new BipartiteGraphPanel();
 
         // Set up the layout
         setLayout(new BorderLayout());
@@ -114,12 +144,30 @@ public class DFSVisualizer extends JFrame {
             }
         });
 
+        pauseButton = new JButton("Pause");
+        pauseButton.setEnabled(false); // Disabled until animation starts
+
+        pauseButton.addActionListener(e -> {
+            if (isPaused) {
+                // Resume animation
+                animationTimer.start();
+                isPaused = false;
+                pauseButton.setText("Pause");
+            } else {
+                // Pause animation
+                animationTimer.stop();
+                isPaused = true;
+                pauseButton.setText("Resume");
+            }
+        });
+
         // Add components to panel
         panel.add(new JLabel("Start Node:"));
         panel.add(nodeSelector);
         panel.add(new JLabel("Speed:"));
         panel.add(speedSlider);
         panel.add(startButton);
+        panel.add(pauseButton);
 
         return panel;
     }
@@ -136,10 +184,18 @@ public class DFSVisualizer extends JFrame {
         traversedEdges.clear();
         currentNode = null;
 
-        // Reset colors
+        // Reset colors based on the bipartite sets
         for (String vertex : graph.getVertices()) {
-            nodeColors.put(vertex, UNVISITED_COLOR);
+            if (setU.contains(vertex)) {
+                nodeColors.put(vertex, UNVISITED_COLOR_U);
+            } else if (setV.contains(vertex)) {
+                nodeColors.put(vertex, UNVISITED_COLOR_V);
+            }
         }
+
+        isPaused = false;
+        pauseButton.setEnabled(false);
+        pauseButton.setText("Pause");
 
         repaint();
     }
@@ -164,6 +220,9 @@ public class DFSVisualizer extends JFrame {
         });
 
         animationTimer.start();
+
+        pauseButton.setEnabled(true);
+        pauseButton.setText("Pause");
     }
 
     private void performDFSStep() {
@@ -202,33 +261,48 @@ public class DFSVisualizer extends JFrame {
             animationTimer.stop();
         }
         animationRunning = false;
+
+        pauseButton.setEnabled(false);
+        pauseButton.setText("Pause"); // Reset label
     }
 
-    private void generateVertexPositions() {
-        Set<String> vertices = graph.getVertices();
-        int numVertices = vertices.size();
+    /**
+     * Generates a bipartite layout with set U on the left and set V on the right.
+     */
+    private void generateBipartiteLayout() {
+        int leftX = WIDTH / 4;
+        int rightX = 3 * WIDTH / 4;
 
-        if (numVertices == 0) return;
+        // Calculate the vertical spacing for each set
+        int spacingU = Math.max(30, HEIGHT / (setU.size() + 1));
+        int spacingV = Math.max(30, HEIGHT / (setV.size() + 1));
 
-        // Arrange vertices in a circle
-        int centerX = WIDTH / 2;
-        int centerY = HEIGHT / 2;
-        int radius = Math.min(WIDTH, HEIGHT) / 3;
-
+        // Arrange vertices in set U on the left side
         int i = 0;
-        for (String vertex : vertices) {
-            double angle = 2 * Math.PI * i / numVertices;
-            int x = (int) (centerX + radius * Math.cos(angle));
-            int y = (int) (centerY + radius * Math.sin(angle));
-            vertexPositions.put(vertex, new Point(x, y));
+        for (String vertex : setU) {
+            int y = (i + 1) * spacingU;
+            if (y > HEIGHT - 50) y = HEIGHT - 50 - (10 * (i % 5)); // Prevent going off screen
+            vertexPositions.put(vertex, new Point(leftX, y));
+            i++;
+        }
+
+        // Arrange vertices in set V on the right side
+        i = 0;
+        for (String vertex : setV) {
+            int y = (i + 1) * spacingV;
+            if (y > HEIGHT - 50) y = HEIGHT - 50 - (10 * (i % 5)); // Prevent going off screen
+            vertexPositions.put(vertex, new Point(rightX, y));
             i++;
         }
     }
 
-    class GraphPanel extends JPanel {
+    /**
+     * Panel for rendering the bipartite graph with DFS visualization.
+     */
+    class BipartiteGraphPanel extends JPanel {
         private JTextArea infoTextArea;
 
-        public GraphPanel() {
+        public BipartiteGraphPanel() {
             setBackground(Color.WHITE);
             setLayout(new BorderLayout());
 
@@ -285,6 +359,9 @@ public class DFSVisualizer extends JFrame {
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
 
+            // Draw partition labels
+            drawPartitionLabels(g2d);
+
             // Draw edges first (so they appear behind vertices)
             drawEdges(g2d);
 
@@ -293,6 +370,26 @@ public class DFSVisualizer extends JFrame {
 
             // Update info text
             updateInfoText();
+        }
+
+        /**
+         * Draws labels for the two partitions.
+         */
+        private void drawPartitionLabels(Graphics2D g2d) {
+            Font originalFont = g2d.getFont();
+            Font labelFont = new Font(originalFont.getName(), Font.BOLD, 16);
+            g2d.setFont(labelFont);
+
+            // Draw Set U label
+            g2d.setColor(SET_U_COLOR.darker());
+            g2d.drawString("Set U", WIDTH / 4 - 25, 30);
+
+            // Draw Set V label
+            g2d.setColor(SET_V_COLOR.darker());
+            g2d.drawString("Set V", 3 * WIDTH / 4 - 25, 30);
+
+            // Reset font
+            g2d.setFont(originalFont);
         }
 
         private void updateInfoText() {
@@ -306,8 +403,13 @@ public class DFSVisualizer extends JFrame {
             info.append("Current Stack: ");
             Stack<String> tempStack = new Stack<>();
             tempStack.addAll(stack);
+            ArrayList<String> stackContents = new ArrayList<>();
             while (!tempStack.isEmpty()) {
-                info.append(tempStack.pop()).append(" ");
+                stackContents.add(tempStack.pop());
+            }
+            // Reverse to show in correct order (top of stack last)
+            for (int i = stackContents.size() - 1; i >= 0; i--) {
+                info.append(stackContents.get(i)).append(" ");
             }
             info.append("\n");
 
@@ -320,12 +422,14 @@ public class DFSVisualizer extends JFrame {
         }
 
         private void drawVertices(Graphics2D g2d) {
+            // Draw all vertices - color will be determined by DFS state
             for (String vertex : graph.getVertices()) {
                 Point position = vertexPositions.get(vertex);
                 if (position == null) continue;
 
-                // Get vertex color based on state
-                Color color = nodeColors.getOrDefault(vertex, UNVISITED_COLOR);
+                // Get the vertex color based on DFS state
+                Color color = nodeColors.getOrDefault(vertex,
+                        setU.contains(vertex) ? UNVISITED_COLOR_U : UNVISITED_COLOR_V);
 
                 // Draw vertex circle
                 g2d.setColor(color);
@@ -334,14 +438,21 @@ public class DFSVisualizer extends JFrame {
                         2 * VERTEX_RADIUS,
                         2 * VERTEX_RADIUS);
 
-                // Draw vertex border
-                g2d.setColor(Color.BLACK);
+                // Draw vertex border - darker if part of current DFS state
+                Color borderColor;
+                if (color == VISITED_COLOR || color == CURRENT_COLOR || color == STACK_COLOR) {
+                    borderColor = color.darker();
+                } else {
+                    borderColor = setU.contains(vertex) ? SET_U_COLOR.darker() : SET_V_COLOR.darker();
+                }
+                g2d.setColor(borderColor);
                 g2d.drawOval(position.x - VERTEX_RADIUS,
                         position.y - VERTEX_RADIUS,
                         2 * VERTEX_RADIUS,
                         2 * VERTEX_RADIUS);
 
                 // Draw vertex label
+                g2d.setColor(Color.BLACK);
                 FontMetrics fm = g2d.getFontMetrics();
                 int textWidth = fm.stringWidth(vertex);
                 int textHeight = fm.getHeight();
@@ -354,7 +465,6 @@ public class DFSVisualizer extends JFrame {
 
         private void drawEdges(Graphics2D g2d) {
             Map<String, List<String>> adjacencyList = getAdjacencyList();
-            boolean isDirected = graph.isDirected();
 
             for (String from : adjacencyList.keySet()) {
                 Point fromPos = vertexPositions.get(from);
@@ -365,51 +475,45 @@ public class DFSVisualizer extends JFrame {
                     if (toPos == null) continue;
 
                     // Check if this edge has been traversed
-                    boolean isTraversed = traversedEdges.contains(new Edge(from, to));
-                    g2d.setColor(isTraversed ? TRAVERSED_EDGE_COLOR : EDGE_COLOR);
-                    g2d.setStroke(new BasicStroke(isTraversed ? 2.5f : 1.5f));
+                    boolean isTraversed = traversedEdges.contains(new Edge(from, to)) ||
+                            traversedEdges.contains(new Edge(to, from));
 
-                    if (isDirected) {
-                        drawArrow(g2d, fromPos, toPos);
-                    } else {
-                        g2d.drawLine(fromPos.x, fromPos.y, toPos.x, toPos.y);
-                    }
+                    // Draw edge with gradient color
+                    drawEdge(g2d, from, to, fromPos, toPos, isTraversed);
                 }
             }
         }
 
-        private void drawArrow(Graphics2D g2d, Point from, Point to) {
-            int dx = to.x - from.x;
-            int dy = to.y - from.y;
+        /**
+         * Draws an edge with appropriate styling based on whether it's been traversed.
+         */
+        private void drawEdge(Graphics2D g2d, String from, String to, Point fromPos, Point toPos, boolean isTraversed) {
+            // Determine edge color
+            Color edgeColor = isTraversed ? TRAVERSED_EDGE_COLOR : EDGE_COLOR;
+
+            // Calculate points where the line meets the vertex circles
+            double dx = toPos.x - fromPos.x;
+            double dy = toPos.y - fromPos.y;
             double length = Math.sqrt(dx * dx + dy * dy);
 
-            // Calculate points where the line meets the circles
-            double fromRatio = VERTEX_RADIUS / length;
-            double toRatio = (length - VERTEX_RADIUS) / length;
+            // Calculate the points where the line intersects the circles
+            double ratio1 = VERTEX_RADIUS / length;
+            double ratio2 = (length - VERTEX_RADIUS) / length;
 
-            int x1 = (int) (from.x + dx * fromRatio);
-            int y1 = (int) (from.y + dy * fromRatio);
-            int x2 = (int) (from.x + dx * toRatio);
-            int y2 = (int) (from.y + dy * toRatio);
+            int x1 = (int) (fromPos.x + dx * ratio1);
+            int y1 = (int) (fromPos.y + dy * ratio1);
+            int x2 = (int) (fromPos.x + dx * ratio2);
+            int y2 = (int) (fromPos.y + dy * ratio2);
 
-            // Draw the main line
+            // Draw the edge
+            g2d.setColor(edgeColor);
+            g2d.setStroke(new BasicStroke(isTraversed ? 2.5f : 1.5f));
             g2d.drawLine(x1, y1, x2, y2);
-
-            // Draw arrowhead
-            double arrowLength = 10;
-            double angle = Math.atan2(dy, dx);
-            double arrowAngle1 = angle - Math.PI / 6;
-            double arrowAngle2 = angle + Math.PI / 6;
-
-            int ax1 = (int) (x2 - arrowLength * Math.cos(arrowAngle1));
-            int ay1 = (int) (y2 - arrowLength * Math.sin(arrowAngle1));
-            int ax2 = (int) (x2 - arrowLength * Math.cos(arrowAngle2));
-            int ay2 = (int) (y2 - arrowLength * Math.sin(arrowAngle2));
-
-            g2d.drawLine(x2, y2, ax1, ay1);
-            g2d.drawLine(x2, y2, ax2, ay2);
         }
 
+        /**
+         * Returns the vertex at the specified point, or null if none is found.
+         */
         private String getVertexAt(Point point) {
             for (Map.Entry<String, Point> entry : vertexPositions.entrySet()) {
                 Point vertexPos = entry.getValue();
@@ -423,7 +527,9 @@ public class DFSVisualizer extends JFrame {
         }
     }
 
-    // Helper method to access the adjacency list from the Graph class
+    /**
+     * Helper method to access the adjacency list from the Graph class.
+     */
     @SuppressWarnings("unchecked")
     private Map<String, List<String>> getAdjacencyList() {
         try {
@@ -460,41 +566,55 @@ public class DFSVisualizer extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
-        // Example usage
-        Graph<String> graph = new Graph<String>(false); // false for undirected graph
-
-        // Add vertices
-        graph.addVertex("A");
-        graph.addVertex("B");
-        graph.addVertex("C");
-        graph.addVertex("D");
-        graph.addVertex("E");
-
-        // Add edges
-        graph.addEdge("A", "B");
-        graph.addEdge("A", "C");
-        graph.addEdge("B", "D");
-        graph.addEdge("C", "D");
-        graph.addEdge("D", "E");
-
-        // Create visualization
-        SwingUtilities.invokeLater(() -> new DFSVisualizer(graph));
-        //SwingUtilities.invokeLater(() -> new DFSVisualizer.visualizeDFS(graph, "A");
-    }
-
     /**
-     * Static method to visualize DFS on any graph
-     * @param graph The graph to visualize
-     * @param startNode The node to start DFS from
+     * Convenience method to visualize DFS on a bipartite graph.
      */
-    public static void visualizeDFS(Graph<String> graph, String startNode) {
+    public static void visualizeDFS(Graph<String> graph, Set<String> setU, Set<String> setV, String startNode) {
         SwingUtilities.invokeLater(() -> {
-            DFSVisualizer visualizer = new DFSVisualizer(graph);
+            BipartiteDFSVisualizer visualizer = new BipartiteDFSVisualizer(graph, setU, setV);
             // Start DFS after a short delay to ensure the GUI is ready
             Timer timer = new Timer(500, e -> visualizer.startDFSVisualization(startNode));
             timer.setRepeats(false);
             timer.start();
         });
+    }
+
+    public static void BipartiteVisualizeDFS(Graph<String> graph, String startNode, Set<String>[] partitions) {
+        // Create visualization and start DFS from U1
+        SwingUtilities.invokeLater(() -> {
+            BipartiteDFSVisualizer visualizer = new BipartiteDFSVisualizer(graph, partitions[0], partitions[1]);
+            Timer timer = new Timer(500, e -> visualizer.startDFSVisualization(startNode));
+            timer.setRepeats(false);
+            timer.start();
+        });
+    }
+
+    public static <V> void visualizeBipartiteDFS(Graph<String> graph, V startNode) {
+        if (!(startNode instanceof String)) {
+            throw new IllegalArgumentException("Start node must be a String for visualization");
+        }
+
+        // Cast to String for visualization
+        String start = (String) startNode;
+
+        Set<String>[] partitions = getBipartitePartitions(graph);
+
+        BipartiteVisualizeDFS(graph, start, partitions);
+    }
+
+
+    /**
+     * Example main method to demonstrate the bipartite DFS visualizer.
+     */
+    public static void main(String[] args) {
+        // Create a simple bipartite graph
+        Graph<String> graph = BipartiteGraphGenerator.generateStringLabelBipartiteGraph(9, 12, 3);
+        graph.printGraph();
+
+        System.out.println("DFS traversal starting from node A:");
+        int maxStackSize = dfsWithOutput(graph, "U1");
+        System.out.println("Maximum stack size during DFS: " + maxStackSize);
+
+        visualizeBipartiteDFS(graph, "U1");
     }
 }

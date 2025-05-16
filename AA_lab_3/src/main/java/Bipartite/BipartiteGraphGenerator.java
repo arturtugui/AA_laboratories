@@ -1,5 +1,6 @@
 package Bipartite;
 
+import DFS.DepthFirstSearch;
 import Graph.Graph;
 
 import java.util.*;
@@ -317,7 +318,7 @@ public class BipartiteGraphGenerator {
     public static void main(String[] args) {
         try {
             // Generate a bipartite graph with 10 vertices (4 in set U, 6 in set V) and 15 edges
-            Graph<String> bipartiteGraph = generateStringLabelBipartiteGraph(9, 12, 3);
+            Graph<String> bipartiteGraph = generateStringLabelBipartiteGraph(10, 12, 5);
 
             System.out.println("Generated random connected bipartite graph:");
             bipartiteGraph.printGraph();
@@ -329,6 +330,7 @@ public class BipartiteGraphGenerator {
                     BipartiteGraphVisualizer.visualizeBipartiteGraph(bipartiteGraph, partitions[0], partitions[1]));
 
             Graph.analyzeGraphComponents(bipartiteGraph);
+            DepthFirstSearch.dfsWithOutput(bipartiteGraph, "U1");
 
         } catch (IllegalArgumentException e) {
             System.err.println("Error: " + e.getMessage());

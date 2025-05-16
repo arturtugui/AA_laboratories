@@ -4,7 +4,7 @@ import Graph.Graph;
 
 import java.util.*;
 
-public class DirectedUndirecrtedGraphGenerator {
+public class DirectedUndirectedGraphGenerator {
 
     /**
      * Generates a random connected graph with n vertices and m edges.

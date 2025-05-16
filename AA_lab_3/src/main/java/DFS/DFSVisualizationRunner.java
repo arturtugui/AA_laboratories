@@ -1,12 +1,10 @@
-package SearchAlgorithms;
+package DFS;
 
-import DirectedAndUndirected.DirectedUndirectedGraphVisualizer;
 import Graph.Graph;
 import javax.swing.*;
 
-import static DirectedAndUndirected.DirectedUndirecrtedGraphGenerator.generateStringLabelGraph;
 import static KRegular.KRegularGraphGenerator.generateStringLabelKRegularGraph;
-import static SearchAlgorithms.DepthFirstSearch.dfs;
+import static DFS.DepthFirstSearch.dfs;
 
 /**
  * A utility class that provides methods to run DFS with visualization.
@@ -20,6 +18,7 @@ public class DFSVisualizationRunner {
      * @param graph The graph to run DFS on
      * @param startNode The starting node for DFS traversal
      */
+
     public static <V> void visualizeDFS(Graph<V> graph, V startNode) {
         if (!(startNode instanceof String)) {
             throw new IllegalArgumentException("Start node must be a String for visualization");

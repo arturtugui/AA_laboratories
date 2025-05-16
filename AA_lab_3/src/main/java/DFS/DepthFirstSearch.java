@@ -1,20 +1,53 @@
-package SearchAlgorithms;
+package DFS;
 
-import Bipartite.BipartiteGraphVisualizer;
-import DirectedAndUndirected.DirectedUndirectedGraphVisualizer;
 import Graph.Graph;
 
-import javax.swing.*;
 import java.util.*;
 
-import static Bipartite.BipartiteGraphGenerator.generateStringLabelBipartiteGraph;
-import static Bipartite.BipartiteGraphGenerator.getBipartitePartitions;
-import static DirectedAndUndirected.DirectedUndirecrtedGraphGenerator.generateStringLabelGraph;
-import static KRegular.KRegularGraphGenerator.generateStringLabelKRegularGraph;
+import static DirectedAndUndirected.DirectedUndirectedGraphGenerator.generateStringLabelGraph;
 
 public class DepthFirstSearch {
 
     public static <V> int dfs(Graph<V> graph, V startNode) {
+        Set<V> visited = new HashSet<>();
+        Stack<V> stack = new Stack<>();
+        int maxStackSize = 0;
+
+        // First push the start node to the stack (but don't mark as visited yet)
+        stack.push(startNode);
+        maxStackSize = 1;
+
+        while (!stack.isEmpty()) {
+            V current = stack.pop();
+
+            // Only process the node if we haven't visited it yet
+            if (!visited.contains(current)) {
+                //System.out.print(current + " ");
+                visited.add(current);
+
+                // Get all neighbors
+                List<V> neighbors = graph.getAdjacencyList().getOrDefault(current, new ArrayList<>());
+
+                // Process neighbors in reverse order to maintain the expected DFS traversal order
+                for (int i = neighbors.size() - 1; i >= 0; i--) {
+                    V neighbor = neighbors.get(i);
+                    if (!visited.contains(neighbor)) {
+                        visited.add(neighbor); // Mark as visited immediately
+                        stack.push(neighbor);
+                        maxStackSize = Math.max(maxStackSize, stack.size());
+                    }
+                }
+
+            }
+        }
+
+        // For debugging: print the number of visited nodes vs total nodes
+        //System.out.println("\nVisited " + visited.size() + " nodes out of " + graph.getAdjacencyList().size() + " total nodes");
+
+        return maxStackSize;
+    }
+
+    public static <V> int dfsWithOutput(Graph<V> graph, V startNode) {
         Set<V> visited = new HashSet<>();
         Stack<V> stack = new Stack<>();
         int maxStackSize = 0;
@@ -38,10 +71,12 @@ public class DepthFirstSearch {
                 for (int i = neighbors.size() - 1; i >= 0; i--) {
                     V neighbor = neighbors.get(i);
                     if (!visited.contains(neighbor)) {
+                        visited.add(neighbor); // Mark as visited immediately
                         stack.push(neighbor);
                         maxStackSize = Math.max(maxStackSize, stack.size());
                     }
                 }
+
             }
         }
 
@@ -53,9 +88,12 @@ public class DepthFirstSearch {
 
     public static void main(String[] args) {
         //undirected
-        Graph<String> graph = generateStringLabelGraph(6, 10, false);
-        graph.printGraph();
-        SwingUtilities.invokeLater(() -> new DirectedUndirectedGraphVisualizer(graph));
+        int n = 5000;
+        //Graph<String> graph = generateStringLabelGraph(n, (n*(n-1))/2, false);
+        Graph<String> graph = generateStringLabelGraph(n, (n-1), false);
+        //Graph<String> graph = generateStringLabelGraph(5000, 4999, false);
+        //graph.printGraph();
+        //SwingUtilities.invokeLater(() -> new DirectedUndirectedGraphVisualizer(graph));
 
 //        //directed
 //        Graph<String> graph = generateStringLabelGraph(6, 20, true);
@@ -89,22 +127,22 @@ public class DepthFirstSearch {
 
 
         // If not all nodes were visited, try to identify disconnected components
-        if (graph.getAdjacencyList().size() > 0) {
-            Set<String> allNodes = new HashSet<>(graph.getAdjacencyList().keySet());
-            Set<String> visited = new HashSet<>();
-
-            // Use the corrected DFS to visit all nodes in each component
-            for (String node : allNodes) {
-                if (!visited.contains(node)) {
-                    System.out.println("\nStarting new component from node " + node + ":");
-                    // This is a simplified DFS just to identify components
-                    Set<String> componentNodes = new HashSet<>();
-                    findConnectedComponent(graph, node, componentNodes);
-                    visited.addAll(componentNodes);
-                    System.out.println("Component size: " + componentNodes.size() + " nodes");
-                }
-            }
-        }
+//        if (graph.getAdjacencyList().size() > 0) {
+//            Set<String> allNodes = new HashSet<>(graph.getAdjacencyList().keySet());
+//            Set<String> visited = new HashSet<>();
+//
+//            // Use the corrected DFS to visit all nodes in each component
+//            for (String node : allNodes) {
+//                if (!visited.contains(node)) {
+//                    System.out.println("\nStarting new component from node " + node + ":");
+//                    // This is a simplified DFS just to identify components
+//                    Set<String> componentNodes = new HashSet<>();
+//                    findConnectedComponent(graph, node, componentNodes);
+//                    visited.addAll(componentNodes);
+//                    System.out.println("Component size: " + componentNodes.size() + " nodes");
+//                }
+//            }
+//        }
     }
 
     // Helper method to find all nodes in a connected component

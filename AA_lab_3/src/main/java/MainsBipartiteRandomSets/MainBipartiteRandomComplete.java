@@ -1,9 +1,8 @@
-package MainsUndirected;
+package MainsBipartiteRandomSets;
 
 import BFS.BreadthFirstSearch;
+import Bipartite.BipartiteGraphVisualizer;
 import DFS.DepthFirstSearch;
-import DirectedAndUndirected.DirectedUndirectedGraphGenerator;
-import DirectedAndUndirected.DirectedUndirectedGraphVisualizer;
 import Graph.Graph;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -13,19 +12,20 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.function.BiFunction;
 
-import static BFS.BFSVisualizer.visualizeBFS;
+import static BFS.BipartiteBFSVisualizer.visualizeBipartiteBFS;
 import static BFS.BreadthFirstSearch.bfsWithOutput;
-import static DFS.DFSVisualizationRunner.visualizeDFS;
+import static Bipartite.BipartiteGraphGenerator.generateStringLabelBipartiteGraph;
+import static Bipartite.BipartiteGraphGenerator.getBipartitePartitions;
+import static DFS.BipartiteDFSVisualizer.visualizeBipartiteDFS;
 import static DFS.DepthFirstSearch.dfsWithOutput;
 
-public class MainUndirectedDense {
+
+public class MainBipartiteRandomComplete {
     public static void main(String[] args) {
-        String category = "Undirected dense graphs";
+        String category = "Bipartite undirected complete graphs (Random sets)";
 
         List<BiFunction<Graph<String>, String, Integer>> functions = new ArrayList<>();
         functions.add(DepthFirstSearch::dfs);
@@ -35,11 +35,12 @@ public class MainUndirectedDense {
         functNames.add("DFS");
         functNames.add("BFS");
 
-        int functionNamesSpace = 10;
+        int functionNamesSpace = 15;
         int cellsSpace = 12;
 
+        //1st one has 12 values, these have 9
         int[] nValues = {10, 50, 100, 250, 500, 750, 1000, 1250, 1500};
-        //int[] nValues = {10, 50, 100, 250, 500, 750, 1000, 1250, 1750, 2500, 3500, 5000};
+        int[] uArray  = new int[nValues.length];
 
 
         Scanner scanner = new Scanner(System.in);
@@ -48,15 +49,23 @@ public class MainUndirectedDense {
 
         Graph<String>[] graphs = new Graph[lines];
 
+        Random rand = new Random();
         for (int i = 0; i < lines; i++) {
             int n = nValues[i];
-            float mFloat = (float) ((n * (n-1) * 0.7) / 2);
-            int m = (int) mFloat;
 
-            graphs[i] = DirectedUndirectedGraphGenerator.generateStringLabelGraph(n, m, false);
+            //setting up the random set sizes, [2, n-2]
+            int u = rand.nextInt(n - 3) + 2;
+            uArray[i] = u;
+            int v = n - u;
+
+            float nFloat = (float) n;
+            float mFloat = (float) ((float) u * (float) v);
+            int m = Math.max((int) mFloat, n - 1);
+
+            graphs[i] = generateStringLabelBipartiteGraph(n, m, u);
         }
 
-        doAlgorithmsComparison(functions, functNames, nValues, category, functionNamesSpace, cellsSpace, graphs);
+        doAlgorithmsComparison(functions, functNames, nValues, category, functionNamesSpace, cellsSpace, graphs, uArray);
 
         do {
             System.out.println("\n\nOptions:");
@@ -72,7 +81,7 @@ public class MainUndirectedDense {
                     readGraphPosition(scanner, choice, graphs);
                     break;
                 case 2:
-                    doAlgorithmsComparison(functions, functNames, nValues, category, functionNamesSpace, cellsSpace, graphs);
+                    doAlgorithmsComparison(functions, functNames, nValues, category, functionNamesSpace, cellsSpace, graphs, uArray);
                     break;
                 case 0:
                     break;
@@ -115,23 +124,25 @@ public class MainUndirectedDense {
                     graph.printGraph();
                     break;
                 case 2:
-                    SwingUtilities.invokeLater(() -> new DirectedUndirectedGraphVisualizer(graph));
+                    Set<String>[] partitions = getBipartitePartitions(graph);
+                    SwingUtilities.invokeLater(() ->
+                            BipartiteGraphVisualizer.visualizeBipartiteGraph(graph, partitions[0], partitions[1]));
                     break;
                 case 3:
-                    System.out.println("\nDFS traversal starting from node A:");
-                    int maxStackSize = dfsWithOutput(graph, "A");
+                    System.out.println("\nDFS traversal starting from node U1:");
+                    int maxStackSize = dfsWithOutput(graph, "U1");
                     System.out.println("Maximum stack size during DFS: " + maxStackSize);
                     break;
                 case 4:
-                    System.out.println("\nBFS traversal starting from node A:");
-                    int maxQueueSize = bfsWithOutput(graph, "A");
+                    System.out.println("\nBFS traversal starting from node U1:");
+                    int maxQueueSize = bfsWithOutput(graph, "U1");
                     System.out.println("Maximum queue size during BFS: " + maxQueueSize);
                     break;
                 case 5:
-                    visualizeDFS(graph, "A");
+                    visualizeBipartiteDFS(graph, "U1");
                     break;
                 case 6:
-                    visualizeBFS(graph, "A");
+                    visualizeBipartiteBFS(graph, "U1");
                     break;
                 case 0:
                     break;
@@ -148,7 +159,8 @@ public class MainUndirectedDense {
                                               String category,
                                               int functionNamesSpace,
                                               int cellsSpace,
-                                              Graph<String>[] graphs) {
+                                              Graph<String>[] graphs,
+                                              int[] uArray) {
         double[] executionTimes = new double[nValues.length];
         int[][] maxSizes = new int[functions.size()][nValues.length];
 
@@ -160,10 +172,10 @@ public class MainUndirectedDense {
         System.out.println("\n\n" + funcNames.get(0) + " vs " + funcNames.get(1) + " analysis on " + category);
 
         System.out.println("Execution time (ms):");
-        System.out.printf("%" + functionNamesSpace + "s", "n values:");
+        System.out.printf("%" + functionNamesSpace + "s", "nValues/sizeOfU");
 
-        for (int nValue : nValues) {
-            System.out.printf("%" + cellsSpace + "s", nValue);
+        for (int i=0; i< nValues.length; i++) {
+            System.out.printf("%" + cellsSpace + "s", (nValues[i] + "/" + uArray[i]));
         }
         System.out.println("\n");
 
@@ -180,7 +192,7 @@ public class MainUndirectedDense {
                 Graph<String> graph = graphs[i];
 
                 long startTime = System.nanoTime();
-                int maxSize = func.apply(graph, "A");
+                int maxSize = func.apply(graph, "U1");
                 long endTime = System.nanoTime();
 
                 long elapsedTime = (endTime - startTime) / 1_000_000;
@@ -200,12 +212,12 @@ public class MainUndirectedDense {
         }
 
         System.out.println("\nMaximum stack/queue size:");
-        System.out.printf("%" + functionNamesSpace + "s", "n values:");
+        System.out.printf("%" + functionNamesSpace + "s", "nValues/sizeOfU");
 
-        for (int nValue : nValues) {
-            System.out.printf("%" + cellsSpace + "s", nValue);
+        for (int i=0; i< nValues.length; i++) {
+            System.out.printf("%" + cellsSpace + "s", (nValues[i] + "/" + uArray[i]));
         }
-        System.out.println();
+        System.out.println("\n");
 
         for (int j = 0; j < functions.size(); j++) {
             String funcName = funcNames.get(j);

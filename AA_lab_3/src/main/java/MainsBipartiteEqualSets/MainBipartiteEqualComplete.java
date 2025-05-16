@@ -1,9 +1,8 @@
-package MainsBipartiteEqual;
+package MainsBipartiteEqualSets;
 
 import BFS.BreadthFirstSearch;
 import Bipartite.BipartiteGraphVisualizer;
 import DFS.DepthFirstSearch;
-import DirectedAndUndirected.DirectedUndirectedGraphVisualizer;
 import Graph.Graph;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -19,18 +18,16 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.function.BiFunction;
 
-import static BFS.BFSVisualizer.visualizeBFS;
 import static BFS.BipartiteBFSVisualizer.visualizeBipartiteBFS;
 import static BFS.BreadthFirstSearch.bfsWithOutput;
 import static Bipartite.BipartiteGraphGenerator.generateStringLabelBipartiteGraph;
 import static Bipartite.BipartiteGraphGenerator.getBipartitePartitions;
 import static DFS.BipartiteDFSVisualizer.visualizeBipartiteDFS;
-import static DFS.DFSVisualizationRunner.visualizeDFS;
 import static DFS.DepthFirstSearch.dfsWithOutput;
 
-public class MainBipartiteEqualSparse {
+public class MainBipartiteEqualComplete {
     public static void main(String[] args) {
-        String category = "Bipartite undirected sparse graphs (Equal sets)";
+        String category = "Bipartite undirected complete graphs (Equal sets)";
 
         List<BiFunction<Graph<String>, String, Integer>> functions = new ArrayList<>();
         functions.add(DepthFirstSearch::dfs);
@@ -56,7 +53,7 @@ public class MainBipartiteEqualSparse {
         for (int i = 0; i < lines; i++) {
             int n = nValues[i];
             float nFloat = (float) n;
-            float mFloat = (float) 0.5 * nFloat/2 * (nFloat - (nFloat /2));
+            float mFloat = (float) 1 * nFloat/2 * (nFloat - (nFloat /2));
             int m = (int) mFloat;
 
             graphs[i] = generateStringLabelBipartiteGraph(n, m, n/2);
@@ -122,7 +119,7 @@ public class MainBipartiteEqualSparse {
                     break;
                 case 2:
                     Set<String>[] partitions = getBipartitePartitions(graph);
-                    javax.swing.SwingUtilities.invokeLater(() ->
+                    SwingUtilities.invokeLater(() ->
                             BipartiteGraphVisualizer.visualizeBipartiteGraph(graph, partitions[0], partitions[1]));
                     break;
                 case 3:

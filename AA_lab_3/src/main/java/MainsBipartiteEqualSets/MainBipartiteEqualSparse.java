@@ -1,9 +1,8 @@
-package MainsUndirected;
+package MainsBipartiteEqualSets;
 
 import BFS.BreadthFirstSearch;
+import Bipartite.BipartiteGraphVisualizer;
 import DFS.DepthFirstSearch;
-import DirectedAndUndirected.DirectedUndirectedGraphGenerator;
-import DirectedAndUndirected.DirectedUndirectedGraphVisualizer;
 import Graph.Graph;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -16,16 +15,19 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.function.BiFunction;
 
-import static BFS.BFSVisualizer.visualizeBFS;
+import static BFS.BipartiteBFSVisualizer.visualizeBipartiteBFS;
 import static BFS.BreadthFirstSearch.bfsWithOutput;
-import static DFS.DFSVisualizationRunner.visualizeDFS;
+import static Bipartite.BipartiteGraphGenerator.generateStringLabelBipartiteGraph;
+import static Bipartite.BipartiteGraphGenerator.getBipartitePartitions;
+import static DFS.BipartiteDFSVisualizer.visualizeBipartiteDFS;
 import static DFS.DepthFirstSearch.dfsWithOutput;
 
-public class MainUndirectedDense {
+public class MainBipartiteEqualSparse {
     public static void main(String[] args) {
-        String category = "Undirected dense graphs";
+        String category = "Bipartite undirected sparse graphs (Equal sets)";
 
         List<BiFunction<Graph<String>, String, Integer>> functions = new ArrayList<>();
         functions.add(DepthFirstSearch::dfs);
@@ -38,8 +40,8 @@ public class MainUndirectedDense {
         int functionNamesSpace = 10;
         int cellsSpace = 12;
 
+        //1st one has 12 values, these have 9
         int[] nValues = {10, 50, 100, 250, 500, 750, 1000, 1250, 1500};
-        //int[] nValues = {10, 50, 100, 250, 500, 750, 1000, 1250, 1750, 2500, 3500, 5000};
 
 
         Scanner scanner = new Scanner(System.in);
@@ -50,10 +52,11 @@ public class MainUndirectedDense {
 
         for (int i = 0; i < lines; i++) {
             int n = nValues[i];
-            float mFloat = (float) ((n * (n-1) * 0.7) / 2);
+            float nFloat = (float) n;
+            float mFloat = (float) 0.5 * nFloat/2 * (nFloat - (nFloat /2));
             int m = (int) mFloat;
 
-            graphs[i] = DirectedUndirectedGraphGenerator.generateStringLabelGraph(n, m, false);
+            graphs[i] = generateStringLabelBipartiteGraph(n, m, n/2);
         }
 
         doAlgorithmsComparison(functions, functNames, nValues, category, functionNamesSpace, cellsSpace, graphs);
@@ -115,23 +118,25 @@ public class MainUndirectedDense {
                     graph.printGraph();
                     break;
                 case 2:
-                    SwingUtilities.invokeLater(() -> new DirectedUndirectedGraphVisualizer(graph));
+                    Set<String>[] partitions = getBipartitePartitions(graph);
+                    javax.swing.SwingUtilities.invokeLater(() ->
+                            BipartiteGraphVisualizer.visualizeBipartiteGraph(graph, partitions[0], partitions[1]));
                     break;
                 case 3:
-                    System.out.println("\nDFS traversal starting from node A:");
-                    int maxStackSize = dfsWithOutput(graph, "A");
+                    System.out.println("\nDFS traversal starting from node U1:");
+                    int maxStackSize = dfsWithOutput(graph, "U1");
                     System.out.println("Maximum stack size during DFS: " + maxStackSize);
                     break;
                 case 4:
-                    System.out.println("\nBFS traversal starting from node A:");
-                    int maxQueueSize = bfsWithOutput(graph, "A");
+                    System.out.println("\nBFS traversal starting from node U1:");
+                    int maxQueueSize = bfsWithOutput(graph, "U1");
                     System.out.println("Maximum queue size during BFS: " + maxQueueSize);
                     break;
                 case 5:
-                    visualizeDFS(graph, "A");
+                    visualizeBipartiteDFS(graph, "U1");
                     break;
                 case 6:
-                    visualizeBFS(graph, "A");
+                    visualizeBipartiteBFS(graph, "U1");
                     break;
                 case 0:
                     break;
@@ -180,7 +185,7 @@ public class MainUndirectedDense {
                 Graph<String> graph = graphs[i];
 
                 long startTime = System.nanoTime();
-                int maxSize = func.apply(graph, "A");
+                int maxSize = func.apply(graph, "U1");
                 long endTime = System.nanoTime();
 
                 long elapsedTime = (endTime - startTime) / 1_000_000;

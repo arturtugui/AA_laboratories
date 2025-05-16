@@ -53,7 +53,7 @@ public class KRegularGraphGenerator {
 
         Random random = new Random();
         boolean isConnected = false;
-        int maxAttempts = 100000; // Limit the number of attempts
+        int maxAttempts = 1000; // Limit the number of attempts
 
         while (!isConnected && maxAttempts > 0) {
             // Clear any existing edges

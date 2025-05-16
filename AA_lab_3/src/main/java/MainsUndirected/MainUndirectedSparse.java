@@ -40,6 +40,7 @@ public class MainUndirectedSparse {
 
         //1st one has 12 values, these have 9
         int[] nValues = {10, 50, 100, 250, 500, 750, 1000, 1250, 1500};
+        //int[] nValues = {10, 50, 100, 250, 500, 750, 1000, 1250, 1750, 2500, 3500, 5000};
 
 
         Scanner scanner = new Scanner(System.in);

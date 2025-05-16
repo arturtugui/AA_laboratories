@@ -1,4 +1,4 @@
-package MainsBipartiteEqual;
+package MainsBipartiteEqualSets;
 
 import BFS.BreadthFirstSearch;
 import Bipartite.BipartiteGraphVisualizer;
@@ -27,7 +27,7 @@ import static DFS.DepthFirstSearch.dfsWithOutput;
 
 public class MainBipartiteEqualDense {
     public static void main(String[] args) {
-        String category = "Bipartite undirected sparse graphs (Equal sets)";
+        String category = "Bipartite undirected dense graphs (Equal sets)";
 
         List<BiFunction<Graph<String>, String, Integer>> functions = new ArrayList<>();
         functions.add(DepthFirstSearch::dfs);
@@ -52,7 +52,8 @@ public class MainBipartiteEqualDense {
 
         for (int i = 0; i < lines; i++) {
             int n = nValues[i];
-            float mFloat = (float) ((n * (n-1) * 0.3) / 2);
+            float nFloat = (float) n;
+            float mFloat = (float) 0.8 * nFloat/2 * (nFloat - (nFloat /2));
             int m = (int) mFloat;
 
             graphs[i] = generateStringLabelBipartiteGraph(n, m, n/2);
@@ -122,13 +123,13 @@ public class MainBipartiteEqualDense {
                             BipartiteGraphVisualizer.visualizeBipartiteGraph(graph, partitions[0], partitions[1]));
                     break;
                 case 3:
-                    System.out.println("\nDFS traversal starting from node A:");
-                    int maxStackSize = dfsWithOutput(graph, "A");
+                    System.out.println("\nDFS traversal starting from node U1:");
+                    int maxStackSize = dfsWithOutput(graph, "U1");
                     System.out.println("Maximum stack size during DFS: " + maxStackSize);
                     break;
                 case 4:
-                    System.out.println("\nBFS traversal starting from node A:");
-                    int maxQueueSize = bfsWithOutput(graph, "A");
+                    System.out.println("\nBFS traversal starting from node U1:");
+                    int maxQueueSize = bfsWithOutput(graph, "U1");
                     System.out.println("Maximum queue size during BFS: " + maxQueueSize);
                     break;
                 case 5:
@@ -184,7 +185,7 @@ public class MainBipartiteEqualDense {
                 Graph<String> graph = graphs[i];
 
                 long startTime = System.nanoTime();
-                int maxSize = func.apply(graph, "A");
+                int maxSize = func.apply(graph, "U1");
                 long endTime = System.nanoTime();
 
                 long elapsedTime = (endTime - startTime) / 1_000_000;

@@ -201,7 +201,7 @@ public class Main3Regular {
         for (int i=0; i< nValues.length; i++) {
             System.out.printf("%" + cellsSpace + "s", (nValues[i] + "/" + 3));
         }
-        System.out.println("");
+        System.out.println("\n");
 
         for (int j = 0; j < functions.size(); j++) {
             String funcName = funcNames.get(j);

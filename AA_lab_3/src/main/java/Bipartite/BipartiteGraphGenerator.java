@@ -318,7 +318,7 @@ public class BipartiteGraphGenerator {
     public static void main(String[] args) {
         try {
             // Generate a bipartite graph with 10 vertices (4 in set U, 6 in set V) and 15 edges
-            Graph<String> bipartiteGraph = generateStringLabelBipartiteGraph(10, 12, 5);
+            Graph<String> bipartiteGraph = generateStringLabelBipartiteGraph(7, 12, 3);
 
             System.out.println("Generated random connected bipartite graph:");
             bipartiteGraph.printGraph();

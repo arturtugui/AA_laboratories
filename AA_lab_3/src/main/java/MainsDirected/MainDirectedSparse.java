@@ -205,7 +205,7 @@ public class MainDirectedSparse {
         for (int nValue : nValues) {
             System.out.printf("%" + cellsSpace + "s", nValue);
         }
-        System.out.println();
+        System.out.println("\n");
 
         for (int j = 0; j < functions.size(); j++) {
             String funcName = funcNames.get(j);

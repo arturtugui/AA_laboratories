@@ -218,8 +218,8 @@ public class DirectedUndirectedGraphGenerator {
     public static void main(String[] args) {
         // Example usage - create a random connected graph with 10 vertices and 15 edges
         try {
-            Graph<String> randomGraph = generateStringLabelGraph(6, 7, false);
-            //Graph<String> randomGraph = generateStringLabelGraph(6, 14, true);
+            //Graph<String> randomGraph = generateStringLabelGraph(6, 9, false);
+            Graph<String> randomGraph = generateStringLabelGraph(5, 14, true);
             System.out.println("Generated random connected graph:");
             randomGraph.printGraph();
 

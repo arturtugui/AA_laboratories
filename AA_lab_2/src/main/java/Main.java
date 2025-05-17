@@ -15,6 +15,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 public class Main {
     public static void main(String[] args) {
+        ///Change Array here
 
         //// for sorted (QuickSort leads to stackoverflow for greater)
         //int[] nValues = {10, 100, 1000, 1500, 3000, 5000, 7500, 10000, 15000, 20000};
@@ -29,7 +30,7 @@ public class Main {
 
 
         List<Consumer<int[]>> sorters = new ArrayList<>();
-        //sorters.add(QuickSorter::quickSortHelper);
+        sorters.add(QuickSorter::quickSortHelper);
         sorters.add(QuickSorter::quickSortMotHelper);
         sorters.add(MergeSorter::mergeSortHelper);
         sorters.add(MergeSorter::mergeSortIterative);
@@ -40,7 +41,7 @@ public class Main {
 
         List<String> functNames = new ArrayList<>();
 
-        //functNames.add("Quick Sort");
+        functNames.add("Quick Sort");
         functNames.add("Quick Sort Mot");
         functNames.add("Merge Sort");
         functNames.add("Merge Sort Iterative");
@@ -123,6 +124,7 @@ public class Main {
             String funcName = funcNames.get(j);
 
             for (int i = 0; i < nValues.length; i++) {
+                ///Chage function here
                 int[] arr = randomArray(nValues[i]);
 
                 double executionTime = measureTime(arr, func, funcName);

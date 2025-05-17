@@ -8,10 +8,17 @@ import java.util.Map;
 import static lab_4.FloydWarshall.FloydWarshall.findAllPairsShortestPaths;
 
 public class AlgorithmsHelper {
-    private static Integer runDijkstra(WeightedGraph<String> graph, String startNode) {
-        // Create new instance each time
+    public static Integer runDijkstra(WeightedGraph<String> graph, String startNode) {
         DijkstraAlgorithm<String> dijkstra = new DijkstraAlgorithm<>(graph);
-        dijkstra.printShortestPaths(startNode);
+        dijkstra.findShortestPaths(startNode);
+        return 1;
+    }
+
+    public static Integer runDijkstraOnAll(WeightedGraph<String> graph, String dummyNode) {
+        DijkstraAlgorithm<String> dijkstra = new DijkstraAlgorithm<>(graph);
+        for(String v : graph.getVertices()){
+            dijkstra.findShortestPaths(v);
+        }
         return 1;
     }
 

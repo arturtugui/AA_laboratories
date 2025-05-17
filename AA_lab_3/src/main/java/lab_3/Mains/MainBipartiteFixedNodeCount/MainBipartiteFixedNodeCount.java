@@ -1,4 +1,4 @@
-package lab_3.Mains.MainBonus;
+package lab_3.Mains.MainBipartiteFixedNodeCount;
 
 import lab_3.BFS.BreadthFirstSearch;
 import lab_3.Bipartite.BipartiteGraphVisualizer;
@@ -41,7 +41,7 @@ public class MainBipartiteFixedNodeCount {
         // Fixed node count but varying partition sizes
         int totalNodes = 1000;
         int[] uSizes = {1, 2, 5, 10, 20, 40, 70, 100, 175, 250, 350, 500};
-        float density = 0.7f; // with 0.1, 0.4 and 0.7
+        float density = 0.7f; // in report was used with 0.1, 0.4 and 0.7
 
         Scanner scanner = new Scanner(System.in);
         int choice = 0;

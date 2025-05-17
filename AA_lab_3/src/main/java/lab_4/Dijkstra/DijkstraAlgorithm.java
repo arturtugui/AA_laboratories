@@ -29,7 +29,7 @@ public class DijkstraAlgorithm<V> {
      * @return A map containing the shortest distance to each vertex
      */
     //DijkstraImplementation
-    public static Map<V, Double> findShortestPaths(V source) {
+    public Map<V, Double> findShortestPaths(V source) {
         // Validation check
         if (!graph.getVertices().contains(source)) {
             throw new IllegalArgumentException("Source vertex not found in graph");

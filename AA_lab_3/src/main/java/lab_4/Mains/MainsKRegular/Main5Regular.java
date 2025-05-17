@@ -1,10 +1,7 @@
-package lab_4.Mains.MainsUndirected;
+package lab_4.Mains.MainsKRegular;
 
-import com.google.gson.stream.JsonToken;
-import lab_3.BFS.BreadthFirstSearch;
-import lab_3.DFS.DepthFirstSearch;
-import lab_3.DirectedAndUndirected.DirectedUndirectedGraphGenerator;
 import lab_3.Graph.Graph;
+import lab_3.KRegular.KRegularGraphGenerator;
 import lab_4.Dijkstra.DijkstraAlgorithm;
 import lab_4.DirectedAndUndirectedWeighted.DirectedAndUndirectedWeightedVisualizer;
 import lab_4.Mains.AlgorithmsHelper;
@@ -27,9 +24,10 @@ import static lab_4.FloydWarshall.FloydWarshall.findAllPairsShortestPaths;
 import static lab_4.FloydWarshall.FloydWarshall.printAllShortestPaths;
 import static lab_4.WeightedGraph.GraphToWeightedGraphConverter.convertToWeightedGraph;
 
-public class MainUndirectedTree {
+public class Main5Regular {
     public static void main(String[] args) {
-        String category = "Undirected tree graphs";
+        int k = 5;
+        String category = "Undirected " + k + "-regular graph";
 
         List<BiFunction<WeightedGraph<String>, String, Integer>> functions = new ArrayList<>();
         functions.add(AlgorithmsHelper::runDijkstraOnAll);
@@ -42,7 +40,7 @@ public class MainUndirectedTree {
         int functionNamesSpace = 23;
         int cellsSpace = 12;
 
-        int[] nValues = {10, 25, 50, 100, 250, 500, 750, 1000, 1250, 1500};
+        int[] nValues = {10, 30, 80, 150, 300, 500, 750, 1000, 1250, 1600, 2000, 2500};
 
         Scanner scanner = new Scanner(System.in);
         int choice = 0;
@@ -51,12 +49,12 @@ public class MainUndirectedTree {
         WeightedGraph<String>[] graphs = new WeightedGraph[lines];
 
         for (int i = 0; i < lines; i++) {
-            Graph<String> unweightedGraph = DirectedUndirectedGraphGenerator.generateStringLabelGraph(nValues[i], nValues[i] - 1, false);
-            WeightedGraph<String> weightedGraph = convertToWeightedGraph(unweightedGraph);
+            Graph<String> graph = KRegularGraphGenerator.generateStringLabelKRegularGraph(nValues[i], k);
+            WeightedGraph<String> weightedGraph = convertToWeightedGraph(graph);
             graphs[i] = weightedGraph;
         }
 
-        doAlgorithmsComparison(functions, functNames, nValues, category, functionNamesSpace, cellsSpace, graphs);
+        doAlgorithmsComparison(functions, functNames, nValues, category, functionNamesSpace, cellsSpace, graphs, k);
 
         do {
             System.out.println("\n\nOptions:");
@@ -72,7 +70,7 @@ public class MainUndirectedTree {
                     readGraphPosition(scanner, choice, graphs);
                     break;
                 case 2:
-                    doAlgorithmsComparison(functions, functNames, nValues, category, functionNamesSpace, cellsSpace, graphs);
+                    doAlgorithmsComparison(functions, functNames, nValues, category, functionNamesSpace, cellsSpace, graphs, k);
                     break;
                 case 0:
                     break;
@@ -155,7 +153,8 @@ public class MainUndirectedTree {
                                               String category,
                                               int functionNamesSpace,
                                               int cellsSpace,
-                                              WeightedGraph<String>[] graphs) {
+                                              WeightedGraph<String>[] graphs,
+                                              int k) {
         double[] executionTimes = new double[nValues.length];
 
         if (functions.size() != funcNames.size()) {
@@ -168,8 +167,8 @@ public class MainUndirectedTree {
         System.out.println("Execution time (ms):");
         System.out.printf("%" + functionNamesSpace + "s", "n values:");
 
-        for (int nValue : nValues) {
-            System.out.printf("%" + cellsSpace + "s", nValue);
+        for (int i=0; i< nValues.length; i++) {
+            System.out.printf("%" + cellsSpace + "s", (nValues[i] + "/" + k));
         }
         System.out.println("\n");
 

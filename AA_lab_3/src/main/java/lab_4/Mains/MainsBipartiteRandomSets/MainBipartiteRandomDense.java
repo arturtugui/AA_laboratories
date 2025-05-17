@@ -1,13 +1,10 @@
-package lab_4.Mains.MainsUndirected;
+package lab_4.Mains.MainsBipartiteRandomSets;
 
-import com.google.gson.stream.JsonToken;
-import lab_3.BFS.BreadthFirstSearch;
-import lab_3.DFS.DepthFirstSearch;
-import lab_3.DirectedAndUndirected.DirectedUndirectedGraphGenerator;
+import lab_3.Bipartite.BipartiteGraphGenerator;
 import lab_3.Graph.Graph;
 import lab_4.Dijkstra.DijkstraAlgorithm;
-import lab_4.DirectedAndUndirectedWeighted.DirectedAndUndirectedWeightedVisualizer;
 import lab_4.Mains.AlgorithmsHelper;
+import lab_4.WeightedGraph.Visualizer;
 import lab_4.WeightedGraph.WeightedGraph;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -17,19 +14,16 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.function.BiFunction;
 
 import static lab_4.FloydWarshall.FloydWarshall.findAllPairsShortestPaths;
 import static lab_4.FloydWarshall.FloydWarshall.printAllShortestPaths;
 import static lab_4.WeightedGraph.GraphToWeightedGraphConverter.convertToWeightedGraph;
 
-public class MainUndirectedTree {
+public class MainBipartiteRandomDense {
     public static void main(String[] args) {
-        String category = "Undirected tree graphs";
+        String category = "Bipartite undirected dense graphs (Random sets)";
 
         List<BiFunction<WeightedGraph<String>, String, Integer>> functions = new ArrayList<>();
         functions.add(AlgorithmsHelper::runDijkstraOnAll);
@@ -42,7 +36,8 @@ public class MainUndirectedTree {
         int functionNamesSpace = 23;
         int cellsSpace = 12;
 
-        int[] nValues = {10, 25, 50, 100, 250, 500, 750, 1000, 1250, 1500};
+        int[] nValues = {5, 10, 20, 40, 80, 150, 200, 300, 400, 500};
+        int[] uArray  = new int[nValues.length];
 
         Scanner scanner = new Scanner(System.in);
         int choice = 0;
@@ -50,13 +45,25 @@ public class MainUndirectedTree {
 
         WeightedGraph<String>[] graphs = new WeightedGraph[lines];
 
+        Random rand = new Random();
         for (int i = 0; i < lines; i++) {
-            Graph<String> unweightedGraph = DirectedUndirectedGraphGenerator.generateStringLabelGraph(nValues[i], nValues[i] - 1, false);
+            int n = nValues[i];
+
+            //setting up the random set sizes, [2, n-2]
+            int u = rand.nextInt(n - 3) + 2;
+            uArray[i] = u;
+            int v = n - u;
+
+            float nFloat = (float) n;
+            float mFloat = (float) (0.8 * (float) u * (float) v);
+            int m = (int) Math.min(Math.max(mFloat, n-1), n*(n-1)/2);
+
+            Graph<String> unweightedGraph = BipartiteGraphGenerator.generateStringLabelBipartiteGraph(n, m, u);
             WeightedGraph<String> weightedGraph = convertToWeightedGraph(unweightedGraph);
             graphs[i] = weightedGraph;
         }
 
-        doAlgorithmsComparison(functions, functNames, nValues, category, functionNamesSpace, cellsSpace, graphs);
+        doAlgorithmsComparison(functions, functNames, nValues, category, functionNamesSpace, cellsSpace, graphs, uArray);
 
         do {
             System.out.println("\n\nOptions:");
@@ -72,7 +79,7 @@ public class MainUndirectedTree {
                     readGraphPosition(scanner, choice, graphs);
                     break;
                 case 2:
-                    doAlgorithmsComparison(functions, functNames, nValues, category, functionNamesSpace, cellsSpace, graphs);
+                    doAlgorithmsComparison(functions, functNames, nValues, category, functionNamesSpace, cellsSpace, graphs, uArray);
                     break;
                 case 0:
                     break;
@@ -101,7 +108,7 @@ public class MainUndirectedTree {
             System.out.println("\n\nFor the given graph:");
             System.out.println("\t1. Show adjacency list");
             System.out.println("\t2. Show the graph (Visual)");
-            System.out.println("\t3. Perform Dijkstra from node A");
+            System.out.println("\t3. Perform Dijkstra from node U1");
             System.out.println("\t4. Perform Dijkstra from a node");
             System.out.println("\t5. Perform Floyd-Warshall on the graph");
             System.out.println("\t0. Exit graph options");
@@ -115,12 +122,12 @@ public class MainUndirectedTree {
                     graph.printGraph();
                     break;
                 case 2:
-                    SwingUtilities.invokeLater(() -> new DirectedAndUndirectedWeightedVisualizer(graph));
+                    Visualizer.visualizeBipartite(graph);
                     break;
                 case 3:
-                    System.out.println("\nDijkstra performed for node A:");
+                    System.out.println("\nDijkstra performed for node U1:");
                     dijkstra1 = new DijkstraAlgorithm<>(graph);
-                    dijkstra1.printShortestPaths("A");
+                    dijkstra1.printShortestPaths("U1");
                     break;
                 case 4:
                     System.out.print("\nEnter the node: ");
@@ -155,7 +162,8 @@ public class MainUndirectedTree {
                                               String category,
                                               int functionNamesSpace,
                                               int cellsSpace,
-                                              WeightedGraph<String>[] graphs) {
+                                              WeightedGraph<String>[] graphs,
+                                              int[] uArray) {
         double[] executionTimes = new double[nValues.length];
 
         if (functions.size() != funcNames.size()) {
@@ -168,8 +176,8 @@ public class MainUndirectedTree {
         System.out.println("Execution time (ms):");
         System.out.printf("%" + functionNamesSpace + "s", "n values:");
 
-        for (int nValue : nValues) {
-            System.out.printf("%" + cellsSpace + "s", nValue);
+        for (int i=0; i< nValues.length; i++) {
+            System.out.printf("%" + cellsSpace + "s", (nValues[i] + "/" + uArray[i]));
         }
         System.out.println("\n");
 
@@ -186,7 +194,7 @@ public class MainUndirectedTree {
                 WeightedGraph<String> graph = graphs[i];
 
                 long startTime = System.nanoTime();
-                func.apply(graph, "A");
+                func.apply(graph, "U1");
                 long endTime = System.nanoTime();
 
                 long elapsedTime = (endTime - startTime) / 1_000_000;

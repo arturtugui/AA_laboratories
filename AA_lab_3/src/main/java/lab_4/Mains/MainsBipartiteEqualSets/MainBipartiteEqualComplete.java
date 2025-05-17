@@ -1,13 +1,10 @@
-package lab_4.Mains.MainsUndirected;
+package lab_4.Mains.MainsBipartiteEqualSets;
 
-import com.google.gson.stream.JsonToken;
-import lab_3.BFS.BreadthFirstSearch;
-import lab_3.DFS.DepthFirstSearch;
-import lab_3.DirectedAndUndirected.DirectedUndirectedGraphGenerator;
+import lab_3.Bipartite.BipartiteGraphGenerator;
 import lab_3.Graph.Graph;
 import lab_4.Dijkstra.DijkstraAlgorithm;
-import lab_4.DirectedAndUndirectedWeighted.DirectedAndUndirectedWeightedVisualizer;
 import lab_4.Mains.AlgorithmsHelper;
+import lab_4.WeightedGraph.Visualizer;
 import lab_4.WeightedGraph.WeightedGraph;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -27,9 +24,9 @@ import static lab_4.FloydWarshall.FloydWarshall.findAllPairsShortestPaths;
 import static lab_4.FloydWarshall.FloydWarshall.printAllShortestPaths;
 import static lab_4.WeightedGraph.GraphToWeightedGraphConverter.convertToWeightedGraph;
 
-public class MainUndirectedTree {
+public class MainBipartiteEqualComplete {
     public static void main(String[] args) {
-        String category = "Undirected tree graphs";
+        String category = "Bipartite undirected complete graphs (Equal sets)";
 
         List<BiFunction<WeightedGraph<String>, String, Integer>> functions = new ArrayList<>();
         functions.add(AlgorithmsHelper::runDijkstraOnAll);
@@ -42,7 +39,7 @@ public class MainUndirectedTree {
         int functionNamesSpace = 23;
         int cellsSpace = 12;
 
-        int[] nValues = {10, 25, 50, 100, 250, 500, 750, 1000, 1250, 1500};
+        int[] nValues = {5, 10, 20, 40, 80, 150, 200, 300, 400, 500};
 
         Scanner scanner = new Scanner(System.in);
         int choice = 0;
@@ -51,7 +48,12 @@ public class MainUndirectedTree {
         WeightedGraph<String>[] graphs = new WeightedGraph[lines];
 
         for (int i = 0; i < lines; i++) {
-            Graph<String> unweightedGraph = DirectedUndirectedGraphGenerator.generateStringLabelGraph(nValues[i], nValues[i] - 1, false);
+            int n = nValues[i];
+            float nFloat = (float) n;
+            float mFloat = (float)  nFloat/2 * (nFloat - (nFloat /2));
+            int m = (int) Math.min(Math.max(mFloat, n-1), n*(n-1)/2);
+
+            Graph<String> unweightedGraph = BipartiteGraphGenerator.generateStringLabelBipartiteGraph(n, m, n/2);
             WeightedGraph<String> weightedGraph = convertToWeightedGraph(unweightedGraph);
             graphs[i] = weightedGraph;
         }
@@ -101,7 +103,7 @@ public class MainUndirectedTree {
             System.out.println("\n\nFor the given graph:");
             System.out.println("\t1. Show adjacency list");
             System.out.println("\t2. Show the graph (Visual)");
-            System.out.println("\t3. Perform Dijkstra from node A");
+            System.out.println("\t3. Perform Dijkstra from node U1");
             System.out.println("\t4. Perform Dijkstra from a node");
             System.out.println("\t5. Perform Floyd-Warshall on the graph");
             System.out.println("\t0. Exit graph options");
@@ -115,12 +117,12 @@ public class MainUndirectedTree {
                     graph.printGraph();
                     break;
                 case 2:
-                    SwingUtilities.invokeLater(() -> new DirectedAndUndirectedWeightedVisualizer(graph));
+                    Visualizer.visualizeBipartite(graph);
                     break;
                 case 3:
-                    System.out.println("\nDijkstra performed for node A:");
+                    System.out.println("\nDijkstra performed for node U1:");
                     dijkstra1 = new DijkstraAlgorithm<>(graph);
-                    dijkstra1.printShortestPaths("A");
+                    dijkstra1.printShortestPaths("U1");
                     break;
                 case 4:
                     System.out.print("\nEnter the node: ");
@@ -186,7 +188,7 @@ public class MainUndirectedTree {
                 WeightedGraph<String> graph = graphs[i];
 
                 long startTime = System.nanoTime();
-                func.apply(graph, "A");
+                func.apply(graph, "U1");
                 long endTime = System.nanoTime();
 
                 long elapsedTime = (endTime - startTime) / 1_000_000;

@@ -1,13 +1,10 @@
-package lab_4.Mains.MainsUndirected;
+package lab_4.Mains.MainBipartiteFixedNodeCount;
 
-import com.google.gson.stream.JsonToken;
-import lab_3.BFS.BreadthFirstSearch;
-import lab_3.DFS.DepthFirstSearch;
-import lab_3.DirectedAndUndirected.DirectedUndirectedGraphGenerator;
+import lab_3.Bipartite.BipartiteGraphGenerator;
 import lab_3.Graph.Graph;
 import lab_4.Dijkstra.DijkstraAlgorithm;
-import lab_4.DirectedAndUndirectedWeighted.DirectedAndUndirectedWeightedVisualizer;
 import lab_4.Mains.AlgorithmsHelper;
+import lab_4.WeightedGraph.Visualizer;
 import lab_4.WeightedGraph.WeightedGraph;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -17,19 +14,18 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.function.BiFunction;
 
 import static lab_4.FloydWarshall.FloydWarshall.findAllPairsShortestPaths;
 import static lab_4.FloydWarshall.FloydWarshall.printAllShortestPaths;
 import static lab_4.WeightedGraph.GraphToWeightedGraphConverter.convertToWeightedGraph;
 
-public class MainUndirectedTree {
+public class MainBipartiteFixedNodeCount {
     public static void main(String[] args) {
-        String category = "Undirected tree graphs";
+        int totalNodes = 500;
+        float density = 0.1f; // in report was used with 0.1, 0.4 and 0.7
+        String category = "Bipartite undirected graphs with " + totalNodes + " nodes with density D=" + density;
 
         List<BiFunction<WeightedGraph<String>, String, Integer>> functions = new ArrayList<>();
         functions.add(AlgorithmsHelper::runDijkstraOnAll);
@@ -42,21 +38,32 @@ public class MainUndirectedTree {
         int functionNamesSpace = 23;
         int cellsSpace = 12;
 
-        int[] nValues = {10, 25, 50, 100, 250, 500, 750, 1000, 1250, 1500};
+        int[] uSizes = {1, 2, 5, 10, 20, 40, 70, 100, 175, 250};
 
         Scanner scanner = new Scanner(System.in);
         int choice = 0;
-        int lines = nValues.length;
+        int lines = uSizes.length;
 
         WeightedGraph<String>[] graphs = new WeightedGraph[lines];
 
         for (int i = 0; i < lines; i++) {
-            Graph<String> unweightedGraph = DirectedUndirectedGraphGenerator.generateStringLabelGraph(nValues[i], nValues[i] - 1, false);
+            int u = uSizes[i];
+            int v = totalNodes - u;
+
+            // Calculating edges: use a fixed proportion of the maximum possible edges
+            // Maximum possible edges in a bipartite graph = u * v
+            float maxEdges = (float) u * (float) v;
+            // Use ~10% of maximum edges, but ensure at least n-1 edges for connectivity
+            int mBefore = Math.max((int) (density * maxEdges), totalNodes - 1);
+
+            int m = (int) Math.min(Math.max(mBefore, totalNodes-1), totalNodes*(totalNodes-1)/2);
+
+            Graph<String> unweightedGraph = BipartiteGraphGenerator.generateStringLabelBipartiteGraph(totalNodes, m, u);
             WeightedGraph<String> weightedGraph = convertToWeightedGraph(unweightedGraph);
             graphs[i] = weightedGraph;
         }
 
-        doAlgorithmsComparison(functions, functNames, nValues, category, functionNamesSpace, cellsSpace, graphs);
+        doAlgorithmsComparison(functions, functNames, uSizes, category, functionNamesSpace, cellsSpace, graphs, totalNodes);
 
         do {
             System.out.println("\n\nOptions:");
@@ -72,8 +79,7 @@ public class MainUndirectedTree {
                     readGraphPosition(scanner, choice, graphs);
                     break;
                 case 2:
-                    doAlgorithmsComparison(functions, functNames, nValues, category, functionNamesSpace, cellsSpace, graphs);
-                    break;
+                    doAlgorithmsComparison(functions, functNames, uSizes, category, functionNamesSpace, cellsSpace, graphs, totalNodes);                    break;
                 case 0:
                     break;
                 default:
@@ -101,7 +107,7 @@ public class MainUndirectedTree {
             System.out.println("\n\nFor the given graph:");
             System.out.println("\t1. Show adjacency list");
             System.out.println("\t2. Show the graph (Visual)");
-            System.out.println("\t3. Perform Dijkstra from node A");
+            System.out.println("\t3. Perform Dijkstra from node U1");
             System.out.println("\t4. Perform Dijkstra from a node");
             System.out.println("\t5. Perform Floyd-Warshall on the graph");
             System.out.println("\t0. Exit graph options");
@@ -115,12 +121,12 @@ public class MainUndirectedTree {
                     graph.printGraph();
                     break;
                 case 2:
-                    SwingUtilities.invokeLater(() -> new DirectedAndUndirectedWeightedVisualizer(graph));
+                    Visualizer.visualizeBipartite(graph);
                     break;
                 case 3:
-                    System.out.println("\nDijkstra performed for node A:");
+                    System.out.println("\nDijkstra performed for node U1:");
                     dijkstra1 = new DijkstraAlgorithm<>(graph);
-                    dijkstra1.printShortestPaths("A");
+                    dijkstra1.printShortestPaths("U1");
                     break;
                 case 4:
                     System.out.print("\nEnter the node: ");
@@ -151,12 +157,13 @@ public class MainUndirectedTree {
 
     public static void doAlgorithmsComparison(List<BiFunction<WeightedGraph<String>, String, Integer>> functions,
                                               List<String> funcNames,
-                                              int[] nValues,
+                                              int[] uSizes,
                                               String category,
                                               int functionNamesSpace,
                                               int cellsSpace,
-                                              WeightedGraph<String>[] graphs) {
-        double[] executionTimes = new double[nValues.length];
+                                              WeightedGraph<String>[] graphs,
+                                              int totalNodes) {
+        double[] executionTimes = new double[uSizes.length];
 
         if (functions.size() != funcNames.size()) {
             System.out.println("Error: Number of functions does not match the number of function names.");
@@ -168,8 +175,8 @@ public class MainUndirectedTree {
         System.out.println("Execution time (ms):");
         System.out.printf("%" + functionNamesSpace + "s", "n values:");
 
-        for (int nValue : nValues) {
-            System.out.printf("%" + cellsSpace + "s", nValue);
+        for (int i = 0; i < uSizes.length; i++) {
+            System.out.printf("%" + cellsSpace + "d", uSizes[i]);
         }
         System.out.println("\n");
 
@@ -182,17 +189,17 @@ public class MainUndirectedTree {
 
             XYSeries series = new XYSeries(funcName);
 
-            for (int i = 0; i < nValues.length; i++) {
+            for (int i = 0; i < uSizes.length; i++) {
                 WeightedGraph<String> graph = graphs[i];
 
                 long startTime = System.nanoTime();
-                func.apply(graph, "A");
+                func.apply(graph, "U1");
                 long endTime = System.nanoTime();
 
                 long elapsedTime = (endTime - startTime) / 1_000_000;
                 executionTimes[i] = elapsedTime;
 
-                series.add(nValues[i], elapsedTime);
+                series.add(uSizes[i], elapsedTime);
             }
 
             dataset.addSeries(series);
@@ -211,7 +218,7 @@ public class MainUndirectedTree {
     public static void plotExecutionTime(XYSeriesCollection dataset, String category) {
         JFreeChart chart = ChartFactory.createXYLineChart(
                 "Execution Time Comparison for " + category, // Chart title
-                "Graph size (nodes)",        // X-axis label
+                "U-partition size",        // X-axis label
                 "Execution Time (ms)",       // Y-axis label
                 dataset,                     // Data
                 PlotOrientation.VERTICAL,

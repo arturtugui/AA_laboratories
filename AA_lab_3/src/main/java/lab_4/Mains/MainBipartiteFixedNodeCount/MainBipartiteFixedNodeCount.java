@@ -24,18 +24,20 @@ import static lab_4.WeightedGraph.GraphToWeightedGraphConverter.convertToWeighte
 public class MainBipartiteFixedNodeCount {
     public static void main(String[] args) {
         int totalNodes = 500;
-        float density = 0.1f; // in report was used with 0.1, 0.4 and 0.7
+        float density = 0.7f; // in report was used with 0.1, 0.4 and 0.7
         String category = "Bipartite undirected graphs with " + totalNodes + " nodes with density D=" + density;
 
         List<BiFunction<WeightedGraph<String>, String, Integer>> functions = new ArrayList<>();
+        functions.add(AlgorithmsHelper::runDijkstra);
         functions.add(AlgorithmsHelper::runDijkstraOnAll);
         functions.add(AlgorithmsHelper::runFloydWarshall);
 
         List<String> functNames = new ArrayList<>();
-        functNames.add("Dijkstra (on all nodes)");
+        functNames.add("Dijkstra on node U1");
+        functNames.add("Dijkstra on All nodes");
         functNames.add("Floyd-Warshall");
 
-        int functionNamesSpace = 23;
+        int functionNamesSpace = 21;
         int cellsSpace = 12;
 
         int[] uSizes = {1, 2, 5, 10, 20, 40, 70, 100, 175, 250};
@@ -170,7 +172,7 @@ public class MainBipartiteFixedNodeCount {
             return;
         }
 
-        System.out.println("\n\n" + funcNames.get(0) + " vs " + funcNames.get(1) + " analysis on " + category);
+        System.out.println("\n\n" + funcNames.get(0) + " vs " + funcNames.get(1) + " vs " + funcNames.get(2) + " analysis on " + category);
 
         System.out.println("Execution time (ms):");
         System.out.printf("%" + functionNamesSpace + "s", "n values:");

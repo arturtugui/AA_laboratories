@@ -26,14 +26,16 @@ public class MainBipartiteRandomSparse {
         String category = "Bipartite undirected sparse graphs (Random sets)";
 
         List<BiFunction<WeightedGraph<String>, String, Integer>> functions = new ArrayList<>();
+        functions.add(AlgorithmsHelper::runDijkstra);
         functions.add(AlgorithmsHelper::runDijkstraOnAll);
         functions.add(AlgorithmsHelper::runFloydWarshall);
 
         List<String> functNames = new ArrayList<>();
-        functNames.add("Dijkstra (on all nodes)");
+        functNames.add("Dijkstra on node U1");
+        functNames.add("Dijkstra on All nodes");
         functNames.add("Floyd-Warshall");
 
-        int functionNamesSpace = 23;
+        int functionNamesSpace = 21;
         int cellsSpace = 12;
 
         int[] nValues = {5, 10, 20, 40, 80, 150, 200, 300, 400, 500};
@@ -171,7 +173,7 @@ public class MainBipartiteRandomSparse {
             return;
         }
 
-        System.out.println("\n\n" + funcNames.get(0) + " vs " + funcNames.get(1) + " analysis on " + category);
+        System.out.println("\n\n" + funcNames.get(0) + " vs " + funcNames.get(1) + " vs " + funcNames.get(2) + " analysis on " + category);
 
         System.out.println("Execution time (ms):");
         System.out.printf("%" + functionNamesSpace + "s", "n values:");

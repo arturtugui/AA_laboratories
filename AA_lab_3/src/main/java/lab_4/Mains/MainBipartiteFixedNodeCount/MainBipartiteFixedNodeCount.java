@@ -24,7 +24,7 @@ import static lab_4.WeightedGraph.GraphToWeightedGraphConverter.convertToWeighte
 public class MainBipartiteFixedNodeCount {
     public static void main(String[] args) {
         int totalNodes = 500;
-        float density = 0.7f; // in report was used with 0.1, 0.4 and 0.7
+        float density = 0.1f; // in report was used with 0.1, 0.4 and 0.7
         String category = "Bipartite undirected graphs with " + totalNodes + " nodes with density D=" + density;
 
         List<BiFunction<WeightedGraph<String>, String, Integer>> functions = new ArrayList<>();
@@ -41,6 +41,9 @@ public class MainBipartiteFixedNodeCount {
         int cellsSpace = 12;
 
         int[] uSizes = {1, 2, 5, 10, 20, 40, 70, 100, 175, 250};
+        //int[] uSizes = {15, 30, 60, 125, 250, 500, 1000, 1250, 1500, 1750, 2000, 2500};
+        //int[] uSizes = {15, 30, 60, 125, 250, 500, 1000, 1250, 1500, 1750};
+        //int[] uSizes = {15, 30, 60, 125, 250, 500, 1000, 1250, 1500};
 
         Scanner scanner = new Scanner(System.in);
         int choice = 0;
@@ -172,8 +175,10 @@ public class MainBipartiteFixedNodeCount {
             return;
         }
 
-        System.out.println("\n\n" + funcNames.get(0) + " vs " + funcNames.get(1) + " vs " + funcNames.get(2) + " analysis on " + category);
+        if(funcNames.size() == 3){
+            System.out.println("\n\n" + funcNames.get(0) + " vs " + funcNames.get(1) + " vs " + funcNames.get(2) + " analysis on " + category);
 
+        }
         System.out.println("Execution time (ms):");
         System.out.printf("%" + functionNamesSpace + "s", "n values:");
 

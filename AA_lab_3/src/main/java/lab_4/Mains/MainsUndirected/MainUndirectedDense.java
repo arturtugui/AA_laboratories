@@ -35,12 +35,14 @@ public class MainUndirectedDense {
 
         List<String> functNames = new ArrayList<>();
         functNames.add("Dijkstra on node A");
-        functNames.add("Dijkstra on All nodes");
-        functNames.add("Floyd-Warshall");
+        //functNames.add("Dijkstra on All nodes");
+        //functNames.add("Floyd-Warshall");
 
         int functionNamesSpace = 21;
         int cellsSpace = 12;
 
+        //int[] nValues = {100, 200, 400, 800, 1600, 3200};
+        //int[] nValues = {10, 20, 40, 80, 160, 320, 640, 1280};
         int[] nValues = {5, 10, 20, 40, 80, 150, 200, 300, 400, 500};
 
         Scanner scanner = new Scanner(System.in);
@@ -166,8 +168,10 @@ public class MainUndirectedDense {
             return;
         }
 
-        System.out.println("\n\n" + funcNames.get(0) + " vs " + funcNames.get(1) + " vs " + funcNames.get(2) + " analysis on " + category);
+        if(funcNames.size() == 3){
+            System.out.println("\n\n" + funcNames.get(0) + " vs " + funcNames.get(1) + " vs " + funcNames.get(2) + " analysis on " + category);
 
+        }
         System.out.println("Execution time (ms):");
         System.out.printf("%" + functionNamesSpace + "s", "n values:");
 

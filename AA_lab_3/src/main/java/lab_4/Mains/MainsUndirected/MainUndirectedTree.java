@@ -45,6 +45,8 @@ public class MainUndirectedTree {
         int cellsSpace = 12;
 
         int[] nValues = {10, 25, 50, 100, 250, 500, 750, 1000, 1250, 1500};
+        //int[] nValues = {100, 200, 400, 800, 1600, 3200, 6400};
+        //int[] nValues = {100, 200, 400, 800, 1600, 3200, 6400, 12800};
 
         Scanner scanner = new Scanner(System.in);
         int choice = 0;
@@ -165,7 +167,10 @@ public class MainUndirectedTree {
             return;
         }
 
-        System.out.println("\n\n" + funcNames.get(0) + " vs " + funcNames.get(1) + " vs " + funcNames.get(2) + " analysis on " + category);
+        if(funcNames.size() == 3){
+            System.out.println("\n\n" + funcNames.get(0) + " vs " + funcNames.get(1) + " vs " + funcNames.get(2) + " analysis on " + category);
+
+        }
 
         System.out.println("Execution time (ms):");
         System.out.printf("%" + functionNamesSpace + "s", "n values:");

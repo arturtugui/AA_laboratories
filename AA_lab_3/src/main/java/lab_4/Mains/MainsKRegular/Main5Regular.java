@@ -35,7 +35,7 @@ public class Main5Regular {
         functions.add(AlgorithmsHelper::runFloydWarshall);
 
         List<String> functNames = new ArrayList<>();
-        functNames.add("Dijkstra on node U1");
+        functNames.add("Dijkstra on node A");
         functNames.add("Dijkstra on All nodes");
         functNames.add("Floyd-Warshall");
 
@@ -43,6 +43,7 @@ public class Main5Regular {
         int cellsSpace = 12;
 
         int[] nValues = {10, 30, 80, 150, 300, 500, 750, 1000, 1250, 1600, 2000, 2500};
+        //int[] nValues = {1250, 2500, 5000, 10000, 20000, 40000, 80000, 160000, 320000, 640000};
 
         Scanner scanner = new Scanner(System.in);
         int choice = 0;
@@ -164,7 +165,10 @@ public class Main5Regular {
             return;
         }
 
-        System.out.println("\n\n" + funcNames.get(0) + " vs " + funcNames.get(1) + " vs " + funcNames.get(2) + " analysis on " + category);
+        if(funcNames.size() == 3){
+            System.out.println("\n\n" + funcNames.get(0) + " vs " + funcNames.get(1) + " vs " + funcNames.get(2) + " analysis on " + category);
+
+        }
 
         System.out.println("Execution time (ms):");
         System.out.printf("%" + functionNamesSpace + "s", "n values:");

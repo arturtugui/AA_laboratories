@@ -14,52 +14,45 @@ public class FloydWarshall {
      */
     //FloydWarshallImplementation
     public static Map<String, double[][]> findAllPairsShortestPaths(WeightedGraph<String> graph) {
-        // Get all vertices from the graph
         List<String> vertices = new ArrayList<>(graph.getVertices());
         int n = vertices.size();
 
-        // Create a vertex-to-index mapping for easier matrix operations
         Map<String, Integer> vertexToIndex = new HashMap<>();
         for (int i = 0; i < n; i++) {
             vertexToIndex.put(vertices.get(i), i);
         }
 
-        // Initialize distance and next matrices
         double[][] dist = new double[n][n];
         double[][] next = new double[n][n];
 
-        // Initialize with infinity for all pairs
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 dist[i][j] = Double.POSITIVE_INFINITY;
-                next[i][j] = -1; // No path initially
+                next[i][j] = -1;
             }
-            dist[i][i] = 0; // Distance from a vertex to itself is 0
+            dist[i][i] = 0;
         }
 
-        // Fill in the direct edge weights
         for (String u : graph.getVertices()) {
             int uIdx = vertexToIndex.get(u);
             for (WeightedEdge<String> edge : graph.getNeighbors(u)) {
                 int vIdx = vertexToIndex.get(edge.target);
                 dist[uIdx][vIdx] = edge.weight;
-                next[uIdx][vIdx] = vIdx; // Direct path from u to v
+                next[uIdx][vIdx] = vIdx;
             }
         }
 
-        // Floyd-Warshall algorithm
         for (int k = 0; k < n; k++) {
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
                     if (dist[i][k] + dist[k][j] < dist[i][j]) {
                         dist[i][j] = dist[i][k] + dist[k][j];
-                        next[i][j] = next[i][k]; // Path from i to j goes through k first
+                        next[i][j] = next[i][k];
                     }
                 }
             }
         }
 
-        // Package the results
         Map<String, double[][]> result = new HashMap<>();
         result.put("distance", dist);
         result.put("next", next);

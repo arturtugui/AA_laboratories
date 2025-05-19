@@ -42,6 +42,7 @@ public class MainUndirectedSparse {
         int cellsSpace = 12;
 
         int[] nValues = {5, 10, 20, 40, 80, 150, 200, 300, 400, 500};
+        //int[] nValues = {10, 25, 50, 100, 250, 500, 750, 1000, 1250, 1500, 3000, 6000};
 
         Scanner scanner = new Scanner(System.in);
         int choice = 0;
@@ -166,8 +167,10 @@ public class MainUndirectedSparse {
             return;
         }
 
-        System.out.println("\n\n" + funcNames.get(0) + " vs " + funcNames.get(1) + " vs " + funcNames.get(2) + " analysis on " + category);
+        if(funcNames.size() == 3){
+            System.out.println("\n\n" + funcNames.get(0) + " vs " + funcNames.get(1) + " vs " + funcNames.get(2) + " analysis on " + category);
 
+        }
         System.out.println("Execution time (ms):");
         System.out.printf("%" + functionNamesSpace + "s", "n values:");
 

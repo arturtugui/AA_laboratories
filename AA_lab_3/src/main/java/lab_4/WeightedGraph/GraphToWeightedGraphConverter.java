@@ -121,7 +121,7 @@ public class GraphToWeightedGraphConverter {
 
     public static void main(String[] args) {
         // undirected
-        Graph<String> graph = DirectedUndirectedGraphGenerator.generateStringLabelGraph(6, 9, false);
+        Graph<String> graph = DirectedUndirectedGraphGenerator.generateStringLabelGraph(4, 5, false);
         System.out.println("Original Undirected Graph:");
         graph.printGraph();
         lab_3.Graph.Visualizer.visualizeDirectedAndUndirected(graph);
@@ -143,7 +143,7 @@ public class GraphToWeightedGraphConverter {
         lab_4.WeightedGraph.Visualizer.visualizeDirectedAndUndirected(weightedGraph);
 
         // undirected bipartite
-        Graph<String> bipartiteGraph = BipartiteGraphGenerator.generateStringLabelBipartiteGraph(7, 9, 3);
+        Graph<String> bipartiteGraph = BipartiteGraphGenerator.generateStringLabelBipartiteGraph(5, 5, 2);
         System.out.println("Original BipartiteGraph:");
         bipartiteGraph.printGraph();
         lab_3.Graph.Visualizer.visualizeBipartite(bipartiteGraph);
@@ -154,7 +154,7 @@ public class GraphToWeightedGraphConverter {
         Visualizer.visualizeBipartite(weightedBipartiteGraph);
 
         // undirected weighted
-        Graph<String> kgraph = KRegularGraphGenerator.generateStringLabelKRegularGraph(10, 3);
+        Graph<String> kgraph = KRegularGraphGenerator.generateStringLabelKRegularGraph(8, 3);
         System.out.println("Original Undirected Graph:");
         kgraph.printGraph();
         lab_3.Graph.Visualizer.visualizeDirectedAndUndirected(kgraph);

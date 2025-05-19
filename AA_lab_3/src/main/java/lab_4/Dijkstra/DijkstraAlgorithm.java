@@ -30,73 +30,51 @@ public class DijkstraAlgorithm<V> {
      */
     //DijkstraImplementation
     public Map<V, Double> findShortestPaths(V source) {
-        // Validation check
         if (!graph.getVertices().contains(source)) {
             throw new IllegalArgumentException("Source vertex not found in graph");
         }
 
-        // Map to store the shortest distance to each vertex
         Map<V, Double> distances = new HashMap<>();
 
-        // Map to store the previous vertex in the optimal path
         Map<V, V> previousVertices = new HashMap<>();
 
-        // Priority queue to get the vertex with minimum distance
-        // Using a custom comparator to compare vertices based on their distances
         PriorityQueue<V> queue = new PriorityQueue<>(
                 Comparator.comparingDouble(v -> distances.getOrDefault(v, Double.POSITIVE_INFINITY))
         );
 
-        // Set of vertices whose shortest distance is already finalized
         Set<V> settled = new HashSet<>();
 
-        // Initialize distances
         for (V vertex : graph.getVertices()) {
-            // Set initial distance as infinity for all vertices except source
             distances.put(vertex, vertex.equals(source) ? 0.0 : Double.POSITIVE_INFINITY);
         }
 
-        // Add source to the priority queue
         queue.add(source);
 
-        // Process vertices while queue is not empty
         while (!queue.isEmpty()) {
-            // Get vertex with minimum distance
             V current = queue.poll();
 
-            // If vertex is already processed, skip
             if (settled.contains(current)) {
                 continue;
             }
 
-            // Mark current vertex as processed
             settled.add(current);
 
-            // Process all adjacent vertices
             for (WeightedEdge<V> edge : graph.getNeighbors(current)) {
                 V neighbor = edge.target;
 
-                // Skip if neighbor is already processed
                 if (settled.contains(neighbor)) {
                     continue;
                 }
 
-                // Calculate new distance
                 double newDistance = distances.get(current) + edge.weight;
 
-                // If new distance is smaller, update the distance
                 if (newDistance < distances.get(neighbor)) {
                     distances.put(neighbor, newDistance);
                     previousVertices.put(neighbor, current);
-
-                    // Add neighbor to queue for processing
-                    // Note: The same vertex might be added multiple times,
-                    // but the priority queue will process the instance with smaller distance first
                     queue.add(neighbor);
                 }
             }
         }
-
         return distances;
     }
 
@@ -263,6 +241,8 @@ public class DijkstraAlgorithm<V> {
         graph.addEdge("C", "D", 4);
         graph.addEdge("C", "E", 5);
         graph.addEdge("E", "D", 1);
+        System.out.println("Graph adjacency list:");
+        graph.printGraph();
 
         // Run Dijkstra's algorithm
         DijkstraAlgorithm<String> dijkstra = new DijkstraAlgorithm<>(graph);
@@ -272,7 +252,7 @@ public class DijkstraAlgorithm<V> {
         //Map<V, Double> distances = findShortestPaths(source);
 
         // Print shortest path from A to E
-        dijkstra.printShortestPath("A", "E");
+        //dijkstra.printShortestPath("A", "E");
         //Map<V, Double> distances = findShortestPath(source, destination);
     }
 

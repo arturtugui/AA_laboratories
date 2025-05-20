@@ -2,8 +2,6 @@ package lab_4.WeightedGraph;
 
 import java.util.*;
 
-import lab_4.WeightedGraph.WeightedEdge;
-
 public class WeightedGraph<V> {
     private final Map<V, List<WeightedEdge<V>>> adjacencyList;
     private final boolean isDirected;
@@ -61,6 +59,29 @@ public class WeightedGraph<V> {
 
     public boolean hasVertex(V vertex) {
         return adjacencyList.containsKey(vertex);
+    }
+
+    public Map<V, List<WeightedEdge<V>>> getAdjacencyList() {
+        return adjacencyList;
+    }
+
+    public WeightedGraph<V> copy() {
+        WeightedGraph<V> copy = new WeightedGraph<>(this.isDirected);
+
+        // Copy all vertices
+        for (V vertex : this.adjacencyList.keySet()) {
+            copy.addVertex(vertex);
+        }
+
+        // Copy all edges (with weights)
+        for (Map.Entry<V, List<WeightedEdge<V>>> entry : this.adjacencyList.entrySet()) {
+            V from = entry.getKey();
+            for (WeightedEdge<V> edge : entry.getValue()) {
+                copy.addEdge(from, edge.getTarget(), edge.getWeight());
+            }
+        }
+
+        return copy;
     }
 }
 

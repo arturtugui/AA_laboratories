@@ -13,5 +13,13 @@ public class WeightedEdge<V> {
     public String toString() {
         return target + " (" + weight + ")";
     }
+
+    public V getTarget() {
+        return target;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
 }
 

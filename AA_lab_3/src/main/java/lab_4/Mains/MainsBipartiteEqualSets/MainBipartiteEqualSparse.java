@@ -32,19 +32,19 @@ public class MainBipartiteEqualSparse {
 
         List<BiFunction<WeightedGraph<String>, String, Integer>> functions = new ArrayList<>();
         functions.add(AlgorithmsHelper::runDijkstra);
-        //functions.add(AlgorithmsHelper::runDijkstraOnAll);
-        //functions.add(AlgorithmsHelper::runFloydWarshall);
+        functions.add(AlgorithmsHelper::runDijkstraOnAll);
+        functions.add(AlgorithmsHelper::runFloydWarshall);
 
         List<String> functNames = new ArrayList<>();
         functNames.add("Dijkstra on node U1");
-        //functNames.add("Dijkstra on All nodes");
-        //functNames.add("Floyd-Warshall");
+        functNames.add("Dijkstra on All nodes");
+        functNames.add("Floyd-Warshall");
 
         int functionNamesSpace = 21;
         int cellsSpace = 12;
 
-        //int[] nValues = {5, 10, 20, 40, 80, 150, 200, 300, 400, 500};
-        int[] nValues = {10, 25, 50, 100, 250, 500, 750, 1000, 1250, 1500, 3000, 6000};
+        int[] nValues = {5, 10, 20, 40, 80, 150, 200, 300, 400, 500};
+        //int[] nValues = {10, 25, 50, 100, 250, 500, 750, 1000, 1250, 1500, 3000, 6000};
 
         Scanner scanner = new Scanner(System.in);
         int choice = 0;

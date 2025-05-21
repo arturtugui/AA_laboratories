@@ -35,8 +35,8 @@ public class MainUndirectedDense {
 
         List<String> functNames = new ArrayList<>();
         functNames.add("Dijkstra on node A");
-        //functNames.add("Dijkstra on All nodes");
-        //functNames.add("Floyd-Warshall");
+        functNames.add("Dijkstra on All nodes");
+        functNames.add("Floyd-Warshall");
 
         int functionNamesSpace = 21;
         int cellsSpace = 12;

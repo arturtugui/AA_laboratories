@@ -29,7 +29,7 @@ public class TestingPrimKruskal {
 
 
     public static void callUndirected(){
-        Graph<String> graph = DirectedUndirectedGraphGenerator.generateStringLabelGraph(6, 9, false);
+        Graph<String> graph = DirectedUndirectedGraphGenerator.generateStringLabelGraph(5, 9, false);
         WeightedGraph<String> weightedGraph = convertToWeightedGraph(graph);
         lab_4.WeightedGraph.Visualizer.visualizeDirectedAndUndirected(weightedGraph);
         //Prim

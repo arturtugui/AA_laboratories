@@ -78,12 +78,9 @@ public class MinimumSpanningTreeGraph<V> extends WeightedGraph<V> {
         if (!hasVertex(startVertex)) {
             throw new IllegalArgumentException("Start vertex not found in the graph");
         }
-
-        // Clear any previous MST
         mstAdjacencyList.clear();
         mstTotalCost = 0;
 
-        // Initialize MST adjacency list with all vertices but no edges
         for (V vertex : getVertices()) {
             mstAdjacencyList.put(vertex, new ArrayList<>());
         }
@@ -91,31 +88,25 @@ public class MinimumSpanningTreeGraph<V> extends WeightedGraph<V> {
         Set<V> visited = new HashSet<>();
         Set<V> unvisited = new HashSet<>(getVertices());
 
-        // Priority queue to get the minimum weight edge
         PriorityQueue<HeapNode<V>> minHeap = new PriorityQueue<>();
 
-        // Start with the first vertex
         visited.add(startVertex);
         unvisited.remove(startVertex);
 
-        // Add all edges from the start vertex to the priority queue
         for (WeightedEdge<V> edge : getNeighbors(startVertex)) {
             minHeap.add(new HeapNode<>(edge.target, startVertex, edge.weight));
         }
 
         while (!unvisited.isEmpty() && !minHeap.isEmpty()) {
-            // Get the edge with minimum weight
             HeapNode<V> node = minHeap.poll();
             V currentVertex = node.vertex;
             V parentVertex = node.parent;
             double weight = node.weight;
 
-            // If the vertex is already visited, skip it
             if (visited.contains(currentVertex)) {
                 continue;
             }
 
-            // Add the edge to MST adjacency list
             mstAdjacencyList.get(parentVertex).add(new WeightedEdge<>(currentVertex, weight));
             if (!isDirected()) {
                 mstAdjacencyList.get(currentVertex).add(new WeightedEdge<>(parentVertex, weight));
@@ -123,11 +114,9 @@ public class MinimumSpanningTreeGraph<V> extends WeightedGraph<V> {
 
             mstTotalCost += weight;
 
-            // Mark as visited
             visited.add(currentVertex);
             unvisited.remove(currentVertex);
 
-            // Add all edges from the current vertex to the priority queue
             for (WeightedEdge<V> edge : getNeighbors(currentVertex)) {
                 if (unvisited.contains(edge.target)) {
                     minHeap.add(new HeapNode<>(edge.target, currentVertex, edge.weight));
@@ -135,11 +124,9 @@ public class MinimumSpanningTreeGraph<V> extends WeightedGraph<V> {
             }
         }
 
-        // Check if we've found a spanning tree for all vertices
         if (!unvisited.isEmpty()) {
             System.out.println("Warning: Graph is not connected. MST does not span all vertices.");
         }
-
         mstComputed = true;
         return mstTotalCost;
     }
@@ -222,20 +209,16 @@ public class MinimumSpanningTreeGraph<V> extends WeightedGraph<V> {
      * @return the total cost of the MST
      */
     public double computeKruskalMST() {
-        // Clear any previous MST
         mstAdjacencyList.clear();
         mstTotalCost = 0;
 
-        // Initialize MST adjacency list with all vertices but no edges
         for (V vertex : getVertices()) {
             mstAdjacencyList.put(vertex, new ArrayList<>());
         }
 
-        // Get all edges and sort them by weight
         List<EdgeTriple<V>> edges = new ArrayList<>();
         for (V source : getVertices()) {
             for (WeightedEdge<V> edge : getNeighbors(source)) {
-                // For undirected graphs, add each edge only once
                 if (!isDirected() && source.toString().compareTo(edge.target.toString()) > 0) {
                     continue;
                 }
@@ -243,30 +226,23 @@ public class MinimumSpanningTreeGraph<V> extends WeightedGraph<V> {
             }
         }
 
-        // Sort edges by weight
         Collections.sort(edges);
 
-        // Create disjoint sets for union-find operations
         DisjointSets<V> sets = new DisjointSets<>(getVertices());
 
-        // Process edges in ascending order of weight
         for (EdgeTriple<V> edge : edges) {
             V source = edge.source;
             V target = edge.target;
             double weight = edge.weight;
 
-            // If including this edge doesn't create a cycle
             if (!sets.isSameSet(source, target)) {
-                // Add the edge to MST adjacency list
                 mstAdjacencyList.get(source).add(new WeightedEdge<>(target, weight));
                 if (!isDirected()) {
                     mstAdjacencyList.get(target).add(new WeightedEdge<>(source, weight));
                 }
 
-                // Update MST cost
                 mstTotalCost += weight;
 
-                // Merge the sets
                 sets.union(source, target);
             }
         }

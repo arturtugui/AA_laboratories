@@ -58,6 +58,8 @@ public class TestingPrimVisualization {
         Graph<String> bipartiteGraph = BipartiteGraphGenerator.generateStringLabelBipartiteGraph(7, 9, 3);
         WeightedGraph<String> weightedBipartiteGraph = convertToWeightedGraph(bipartiteGraph);
         Visualizer.visualizeBipartite(weightedBipartiteGraph);
+        System.out.println("\nGraph structure:");
+        weightedBipartiteGraph.printGraph();
         //Prim
         MinimumSpanningTreeGraph<String> mstGraph = new MinimumSpanningTreeGraph<>(weightedBipartiteGraph);
         String startVertex = mstGraph.getVertices().iterator().next();

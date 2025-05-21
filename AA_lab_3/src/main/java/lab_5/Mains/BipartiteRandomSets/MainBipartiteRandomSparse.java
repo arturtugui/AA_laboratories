@@ -1,4 +1,4 @@
-package lab_4.Mains.MainsBipartiteRandomSets;
+package lab_5.Mains.BipartiteRandomSets;
 
 import lab_3.Bipartite.BipartiteGraphGenerator;
 import lab_3.Graph.Graph;
@@ -6,6 +6,10 @@ import lab_4.Dijkstra.DijkstraAlgorithm;
 import lab_4.Mains.AlgorithmsHelper;
 import lab_4.WeightedGraph.Visualizer;
 import lab_4.WeightedGraph.WeightedGraph;
+import lab_5.Algorithms.MinimumSpanningTreeGraph;
+import lab_5.KruskalVisualization.BipartiteKruskalVisualizer;
+import lab_5.Mains.AlgorithmsHelperLab5;
+import lab_5.PrimVisualization.BipartitePrimVisualizer;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -21,24 +25,29 @@ import static lab_4.FloydWarshall.FloydWarshall.findAllPairsShortestPaths;
 import static lab_4.FloydWarshall.FloydWarshall.printAllShortestPaths;
 import static lab_4.WeightedGraph.GraphToWeightedGraphConverter.convertToWeightedGraph;
 
-public class MainBipartiteRandomComplete {
+public class MainBipartiteRandomSparse {
     public static void main(String[] args) {
-        String category = "Bipartite undirected complete graphs (Random sets)";
+        String category = "Bipartite undirected sparse graphs (Random sets)";
 
         List<BiFunction<WeightedGraph<String>, String, Integer>> functions = new ArrayList<>();
-        functions.add(AlgorithmsHelper::runDijkstra);
-        functions.add(AlgorithmsHelper::runDijkstraOnAll);
-        functions.add(AlgorithmsHelper::runFloydWarshall);
+        functions.add(AlgorithmsHelperLab5::runPrim);
+        functions.add(AlgorithmsHelperLab5::runKruskal);
 
         List<String> functNames = new ArrayList<>();
-        functNames.add("Dijkstra on node U1");
-        functNames.add("Dijkstra on All nodes");
-        functNames.add("Floyd-Warshall");
+        functNames.add("Prim");
+        functNames.add("Kruskal");
 
-        int functionNamesSpace = 21;
-        int cellsSpace = 12;
+        int functionNamesSpace = 10;
+        int cellsSpace = 11;
 
-        int[] nValues = {5, 10, 20, 40, 80, 150, 200, 300, 400, 500};
+        int[] nValues = {30, 75, 150, 300, 400, 500, 600, 800, 1000, 1200, 1600, 2000, 2400}; //fast
+        //int[] nValues = {30, 75, 150, 300, 400, 500, 600, 800, 1000, 1200, 1600, 2000, 2400, 3200, 4800, 6400}; //slow
+        //System.out.println(nValues.length);
+
+        //to show a graph
+        //int[] nValues = {5, 10, 20, 40, 80, 160, 320, 640, 1280, 2560}; //runs fast
+        //int[] nValues = {5, 10, 20, 40, 80, 160, 320, 640, 1280, 2560, 5120}; //runs slow
+
         int[] uArray  = new int[nValues.length];
 
         Scanner scanner = new Scanner(System.in);
@@ -57,7 +66,7 @@ public class MainBipartiteRandomComplete {
             int v = n - u;
 
             float nFloat = (float) n;
-            float mFloat = (float) ( (float) u * (float) v);
+            float mFloat = (float) (0.5 * (float) u * (float) v);
             int m = (int) Math.min(Math.max(mFloat, n-1), n*(n-1)/2);
 
             Graph<String> unweightedGraph = BipartiteGraphGenerator.generateStringLabelBipartiteGraph(n, m, u);
@@ -108,47 +117,50 @@ public class MainBipartiteRandomComplete {
     public static void graphOptions(Scanner scanner, int choice, WeightedGraph<String> graph) {
         do {
             System.out.println("\n\nFor the given graph:");
-            System.out.println("\t1. Show adjacency list");
+            System.out.println("\t1. Print adjacency list");
             System.out.println("\t2. Show the graph (Visual)");
-            System.out.println("\t3. Perform Dijkstra from node U1");
-            System.out.println("\t4. Perform Dijkstra from a node");
-            System.out.println("\t5. Perform Floyd-Warshall on the graph");
+            System.out.println("\t3. Print and show the MST of Prim's algorithm (Visual)");
+            System.out.println("\t4. Print and show the MST of Kruskal's algorithm (Visual)");
+            System.out.println("\t5. Show how Prim's algorithm is performed (Visual)");
+            System.out.println("\t6. Show how Kruskal's algorithm is performed (Visual)");
             System.out.println("\t0. Exit graph options");
             System.out.print("Enter your choice: ");
 
             choice = scanner.nextInt();
 
-            DijkstraAlgorithm<String> dijkstra1;
             switch (choice) {
                 case 1:
+                    System.out.println("\nGraph adjacency list:");
                     graph.printGraph();
                     break;
                 case 2:
-                    Visualizer.visualizeBipartite(graph);
+                    lab_4.WeightedGraph.Visualizer.visualizeBipartite(graph);
                     break;
                 case 3:
-                    System.out.println("\nDijkstra performed for node U1:");
-                    dijkstra1 = new DijkstraAlgorithm<>(graph);
-                    dijkstra1.printShortestPaths("U1");
+                    MinimumSpanningTreeGraph<String> mstGraph = new MinimumSpanningTreeGraph<>(graph);
+                    String startVertex = mstGraph.getVertices().iterator().next();
+                    double primCost = mstGraph.computePrimMST(startVertex);
+                    System.out.println("\nPrim algorithm:");
+                    mstGraph.printMST();
+                    lab_4.WeightedGraph.Visualizer.visualizeBipartite(mstGraph.getMSTAsGraph());
                     break;
                 case 4:
-                    System.out.print("\nEnter the node: ");
-                    scanner.nextLine();
-                    String node = scanner.nextLine().trim();
-
-                    if (graph.hasVertex(node)) {
-                        System.out.println("\nDijkstra performed for node " + node + ":");
-                        dijkstra1 = new DijkstraAlgorithm<>(graph);
-                        dijkstra1.printShortestPaths(node);
-                    } else {
-                        System.out.println("\nThe graph does not contain node: " + node);
-                    }
+                    MinimumSpanningTreeGraph<String> mstGraph2 = new MinimumSpanningTreeGraph<>(graph);
+                    double kruskalCost = mstGraph2.computeKruskalMST();
+                    System.out.println("\nKruskal algorithm:");
+                    mstGraph2.printMST();
+                    lab_4.WeightedGraph.Visualizer.visualizeBipartite(mstGraph2.getMSTAsGraph());
                     break;
                 case 5:
-                    System.out.println("\nShortest path with Floyd-Warshall:");
-                    Map<String, double[][]> result = findAllPairsShortestPaths(graph);
-                    printAllShortestPaths(graph, result);
+                    MinimumSpanningTreeGraph<String> mstGraph3 = new MinimumSpanningTreeGraph<>(graph);
+                    String startVertex3 = mstGraph3.getVertices().iterator().next();
+                    double primCost3 = mstGraph3.computePrimMST(startVertex3);
+                    BipartitePrimVisualizer.visualizeBipartite(graph);
                     break;
+                case 6:
+                    MinimumSpanningTreeGraph<String> mstGraph4 = new MinimumSpanningTreeGraph<>(graph);
+                    double kruskalCost4 = mstGraph4.computeKruskalMST();
+                    BipartiteKruskalVisualizer.visualizeBipartite(graph);
                 case 0:
                     break;
                 default:
@@ -173,10 +185,8 @@ public class MainBipartiteRandomComplete {
             return;
         }
 
-        if(funcNames.size() == 3){
-            System.out.println("\n\n" + funcNames.get(0) + " vs " + funcNames.get(1) + " vs " + funcNames.get(2) + " analysis on " + category);
+        System.out.println("\n\n" + funcNames.get(0) + " vs " + funcNames.get(1) + " analysis on " + category);
 
-        }
         System.out.println("Execution time (ms):");
         System.out.printf("%" + functionNamesSpace + "s", "n values:");
 

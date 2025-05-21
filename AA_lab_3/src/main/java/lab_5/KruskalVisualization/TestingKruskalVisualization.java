@@ -21,11 +21,11 @@ public class TestingKruskalVisualization {
         ///Prim and Kruskal are not intended for directed graphs
 
         // undirected bipartite
-        callBipartite();
+        //callBipartite();
 
 
         // undirected k-regular
-        //callKGraph();
+        callKGraph();
 
     }
 
@@ -80,6 +80,8 @@ public class TestingKruskalVisualization {
         Graph<String> kgraph = KRegularGraphGenerator.generateStringLabelKRegularGraph(6, 3);
         WeightedGraph<String> weightedGraph = convertToWeightedGraph(kgraph);
         Visualizer.visualizeDirectedAndUndirected(weightedGraph);
+        System.out.println("\nGraph adjacency list:");
+        weightedGraph.printGraph();
 //        //Prim
 //        MinimumSpanningTreeGraph<String> mstGraph = new MinimumSpanningTreeGraph<>(weightedGraph);
 //        String startVertex = mstGraph.getVertices().iterator().next();
